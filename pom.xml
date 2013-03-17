@@ -145,9 +145,8 @@
 								-e '/^prefix=/d' \
 								-e '/^exec_prefix=/d' \
 								-e '/^tablesdir=/d' \
-								-e 's|@libdir@|${prefix}/louis-${project.version}-${nar.aol}-shared/lib/${nar.aol}/shared|' \
-								-e 's|@includedir@|${prefix}/louis-${project.version}-noarch/include|' \
-								-e 's|@VERSION@|${project.version}|' \
+								-e 's|@libdir@|@NAR@/lib/${nar.aol}/shared|' \
+								-e 's|@includedir@|@NAR@/include|' \
 								../../target/checkout/liblouis.pc.in > liblouis.pc.in
 							</script>
 						</configuration>
