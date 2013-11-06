@@ -49,7 +49,7 @@
 						</goals>
 						<configuration>
 							<connectionUrl>scm:svn:http://liblouis.googlecode.com/svn/trunk/</connectionUrl>
-							<scmVersion>895</scmVersion>
+							<scmVersion>1005</scmVersion>
 							<scmVersionType>revision</scmVersionType>
 							<skipCheckoutIfExists>true</skipCheckoutIfExists>
 						</configuration>
