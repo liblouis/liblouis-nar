@@ -17,3 +17,10 @@ To install pkg-config on Mac OS X:
 
     brew install pkg-config
     sudo ln -s /usr/local/share/aclocal/pkg.m4 /usr/share/aclocal
+
+Deploy
+------
+
+To deploy to Sonatype OSS, use the `sonatype-deploy` profile:
+
+    mvn clean deploy -P sonatype-deploy
