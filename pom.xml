@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.liblouis</groupId>
 	<artifactId>louis</artifactId>
-	<version>2.5.4</version>
+	<version>2.6.0-SNAPSHOT</version>
 	<packaging>nar</packaging>
 	<name>liblouis-nar</name>
 	<description>liblouis packaged in a NAR (Native ARchive).</description>
@@ -39,7 +39,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-scm-plugin</artifactId>
-				<version>1.8.1</version>
+				<version>1.9</version>
 				<executions>
 					<execution>
 						<id>checkout-sources</id>
@@ -48,9 +48,9 @@
 							<goal>checkout</goal>
 						</goals>
 						<configuration>
-							<connectionUrl>scm:svn:http://liblouis.googlecode.com/svn/trunk/</connectionUrl>
-							<scmVersion>1121</scmVersion>
-							<scmVersionType>revision</scmVersionType>
+							<connectionUrl>scm:git:git://github.com/liblouis/liblouis.git</connectionUrl>
+							<scmVersion>master</scmVersion>
+							<scmVersionType>branch</scmVersionType>
 							<skipCheckoutIfExists>true</skipCheckoutIfExists>
 						</configuration>
 					</execution>
@@ -136,7 +136,7 @@
 								-e 's|^\(liblouis_la_LDFLAGS =\)\(.*\)$|\1 ${nar.install_name.option} ${nar.rpath.option} -avoid-version \2|' \
 								../../target/checkout/liblouis/Makefile.am > liblouis/Makefile.am
 								sed \
-								-e 's|^\(AC_INIT(liblouis,\).*\(,.*\)$|\1 ${project.version}\2|' \
+								-e 's|^\(AC_INIT(\[Liblouis\],\)[^,]*\(,.*\)$|\1 [${project.version}]\2|' \
 								-e '/^AC_INIT.*$/a\
 								CFLAGS="$CFLAGS ${nar.arch.option}"\
 								' \
