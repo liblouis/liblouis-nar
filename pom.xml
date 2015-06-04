@@ -49,8 +49,8 @@
 						</goals>
 						<configuration>
 							<connectionUrl>scm:git:git://github.com/liblouis/liblouis.git</connectionUrl>
-							<scmVersion>master</scmVersion>
-							<scmVersionType>branch</scmVersionType>
+							<scmVersion>v2.6.3</scmVersion>
+							<scmVersionType>tag</scmVersionType>
 							<skipCheckoutIfExists>true</skipCheckoutIfExists>
 						</configuration>
 					</execution>
