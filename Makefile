@@ -1,6 +1,6 @@
 MVN := mvn
 COMPOSE := docker-compose
-VERSION := 2.6.3-SNAPSHOT
+VERSION := 2.6.3
 
 TARGET_NAR_LINUX_32 := $(addprefix target/nar/louis-$(VERSION)-i386-Linux-gpp-,executable shared)
 TARGET_NAR_LINUX_64 := $(addprefix target/nar/louis-$(VERSION)-amd64-Linux-gpp-,executable shared)
@@ -40,8 +40,8 @@ $(TARGET_NAR_WIN_64) :
 
 snapshot :
 	[[ $(VERSION) == *-SNAPSHOT ]]
-	$(MVN) nar:nar-package deploy:deploy
+	$(MVN) nar:nar-package install:install deploy:deploy
 
 release :
 	[[ $(VERSION) != *-SNAPSHOT ]]
-	$(MVN) nar:nar-package jar:jar gpg:sign deploy:deploy -Psonatype-deploy
+	$(MVN) nar:nar-package jar:jar gpg:sign install:install deploy:deploy -Psonatype-deploy
