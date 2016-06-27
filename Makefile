@@ -1,6 +1,6 @@
 MVN := mvn
 COMPOSE := docker-compose
-VERSION := 2.6.3
+VERSION := 3.0.0-alpha1
 
 TARGET_NAR_LINUX_32 := $(addprefix target/nar/louis-$(VERSION)-i386-Linux-gpp-,executable shared)
 TARGET_NAR_LINUX_64 := $(addprefix target/nar/louis-$(VERSION)-amd64-Linux-gpp-,executable shared)
@@ -29,7 +29,7 @@ $(TARGET_NAR_MAC_32) :
 	$(MVN) test -Dos.arch=i386
 
 $(TARGET_NAR_MAC_64) :
-	[[ "$$(uname)" == Darwin &&  "$$(uname -m)" == x86_64 ]]
+	[[ "$$(uname)" == Darwin && "$$(uname -m)" == x86_64 ]]
 	$(MVN) test
 
 $(TARGET_NAR_WIN_32) :
