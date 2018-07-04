@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:liblouis/liblouis.git
 	branch = master
-	commit = 769307dc0c0eccf364bb4f7734bf691fcca9b5be
-	parent = 835ff27f483bfa45d333cf66615cd83fe1fe1fb4
+	commit = b5767bf0062e601063b83e398d0c9830f7a89165
+	parent = 0585c8040c629f2495f2cb03280941ae2875a5a7
 	cmdver = 0.3.1
