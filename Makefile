@@ -44,4 +44,10 @@ snapshot :
 
 release :
 	[[ $(VERSION) != *-SNAPSHOT ]]
-	$(MVN) nar:nar-package jar:jar gpg:sign install:install deploy:deploy -Psonatype-deploy
+	$(MVN) nar:nar-package jar:jar gpg:sign install:install \
+	       org.sonatype.plugins:nexus-staging-maven-plugin:1.6.8:deploy \
+	       -Psonatype-deploy \
+	       -DnexusUrl=https://oss.sonatype.org/ \
+	       -DserverId=sonatype-nexus-staging \
+	       -DstagingDescription='$(VERSION)' \
+	       -DkeepStagingRepositoryOnCloseRuleFailure=true
