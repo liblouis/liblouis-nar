@@ -227,7 +227,7 @@ _lou_showAttributes(TranslationTableCharacterAttributes a) {
 
 void EXPORT_CALL
 _lou_outOfMemory(void) {
-	_lou_logMessage(LOG_FATAL, "liblouis: Insufficient memory\n");
+	_lou_logMessage(LOU_LOG_FATAL, "liblouis: Insufficient memory\n");
 	exit(3);
 }
 
@@ -238,3 +238,17 @@ _lou_debugHook(void) {
 	printf("%s\n", hook);
 }
 #endif
+
+static const int validTranslationModes[] = { noContractions, compbrlAtCursor, dotsIO,
+	compbrlLeftCursor, ucBrl, noUndefinedDots, partialTrans };
+
+int EXPORT_CALL
+_lou_isValidMode(int mode) {
+	// mask out all valid mode bits. If you end up with some bits set
+	// then the input isn't valid. See
+	// https://en.wikipedia.org/wiki/Material_nonimplication
+	for (int i = 0; i < (sizeof(validTranslationModes) / sizeof(*validTranslationModes));
+			i++)
+		mode &= ~validTranslationModes[i];
+	return !mode;
+}

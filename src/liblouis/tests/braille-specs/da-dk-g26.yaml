@@ -1,4 +1,4 @@
-display: unicode.dis
+display: unicode-without-blank.dis
 table:
   locale: da
   grade: 2
@@ -614,7 +614,7 @@ tests:
   - ["⠼⠁ ⠚⠴", "1%"]
   
 # Extra digits
-  - ["⠼⠁⠼⠁⠌⠙ ⠘⠖ ⠼⠁⠼⠁⠌⠃ ⠘⠶ ⠼⠃⠼⠉⠌⠙", "1 1/4 + 1 1/2 = 2 3/4"]
+  - ["⠼⠁⠼⠁⠌⠙ ⠘⠖ ⠼⠁⠼⠁⠌⠃ ⠘⠶ ⠼⠃⠼⠉⠌⠙", "1 1/4 + 1 1/2 = 2 3/4", {xfail: true}]
 
 #Times vs. bullit
   - ["⠘⠄⠨⠃⠥⠇⠇⠊⠞", "\u2022Bullit"]
@@ -799,7 +799,7 @@ tests:
   - ["⠠⠖⠨⠖", "!Fra"]
   - ["⠖⠋⠗⠁", "!fra"]
   - ["⠈⠨⠴", "'Af"]
-  - ["⠈⠁⠋", "\'af"]
+  - ["⠈⠁⠋", "'af"]
 
 # No single cell contractions before or after dashes
 

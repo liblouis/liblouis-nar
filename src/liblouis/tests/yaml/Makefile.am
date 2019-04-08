@@ -2,6 +2,7 @@ EXTRA_DIST =					\
 	back_cont_then_punc.yaml		\
 	before_begmidword.yaml			\
 	begcaps_endcaps.yaml			\
+	capitalization.yaml			\
 	capsnocont.yaml				\
 	capsword_for_back.yaml			\
 	compbrlAtCursor_with_equals.yaml	\
@@ -10,6 +11,7 @@ EXTRA_DIST =					\
 	emphasis-no-context.yaml		\
 	example_test.yaml			\
 	foo.yaml				\
+	hyphenation_nocross_harness.yaml	\
 	inpos_outpos.yaml			\
 	issue-238.yaml				\
 	issue-35.yaml				\
@@ -21,13 +23,18 @@ EXTRA_DIST =					\
 	issue-479.yaml				\
 	issue-498.yaml				\
 	issue-537.yaml				\
-	issue-77.yaml 				\
+	issue-583.yaml				\
+	issue-584.yaml				\
+	issue-615.yaml				\
+	issue-77.yaml				\
 	letterDefTest_harness.yaml		\
 	multipass-backward.yaml			\
 	multipass-forward.yaml			\
 	multipass.yaml				\
 	multipass-negation.yaml			\
 	new_emph.yaml				\
-	nocross_harness.yaml			\
 	noletsignafter.yaml			\
+	pass0_typebuf.yaml			\
+	present_progressive.yaml		\
+	squash_space.yaml			\
 	syllable.yaml

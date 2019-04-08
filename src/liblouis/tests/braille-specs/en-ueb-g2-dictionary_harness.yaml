@@ -1,4 +1,4 @@
-display: unicode.dis
+display: unicode-without-blank.dis
 table:
   locale: en
   grade: 2
@@ -1240,7 +1240,7 @@ tests:
   - [BASIC's, ⠠⠠⠃⠁⠎⠊⠉⠄⠎]
   - [BB's, ⠠⠠⠃⠃⠄⠎]
   - [BC's, ⠠⠠⠃⠉⠄⠎]
-  - [BLT's, ⠰⠠⠠⠃⠇⠞⠄⠎, {xfail: true}]
+  - [BLT's, ⠰⠠⠠⠃⠇⠞⠄⠎]
   - [BM's, ⠠⠠⠃⠍⠄⠎]
   - [BMW, ⠠⠠⠃⠍⠺]
   - [BMW's, ⠠⠠⠃⠍⠺⠄⠎]
@@ -1765,7 +1765,7 @@ tests:
   - [Beth's, ⠠⠃⠑⠹⠄⠎]
   - [Bethany, ⠠⠃⠑⠹⠁⠝⠽]
   - [Bethe, ⠠⠃⠑⠮]
-  - [Bethesda, ⠠⠃⠑⠮⠎⠙⠁]
+  - [Bethesda, ⠠⠆⠮⠎⠙⠁]
   - [Bethlehem, ⠠⠃⠑⠹⠇⠑⠓⠑⠍]
   - [Bethune, ⠠⠃⠑⠹⠥⠝⠑]
   - [Betsy, ⠠⠆⠞⠎⠽, {xfail: true}]
@@ -1915,7 +1915,7 @@ tests:
   - [Bluebeard's, ⠠⠃⠇⠥⠑⠃⠑⠜⠙⠄⠎]
   - [Bluetooth, ⠠⠃⠇⠥⠑⠞⠕⠕⠹]
   - [Bluetooth's, ⠠⠃⠇⠥⠑⠞⠕⠕⠹⠄⠎]
-  - [Blvd, ⠰⠠⠃⠇⠧⠙, {xfail: true}]
+  - [Blvd, ⠰⠠⠃⠇⠧⠙]
   - [Blythe, ⠠⠃⠇⠽⠮]
   - [Blythe's, ⠠⠃⠇⠽⠮⠄⠎]
   - [Boas, ⠠⠃⠕⠁⠎]
@@ -4374,8 +4374,8 @@ tests:
   - [Douala's, ⠠⠙⠳⠁⠇⠁⠄⠎]
   - [Douay, ⠠⠙⠳⠁⠽]
   - [Douay's, ⠠⠙⠳⠁⠽⠄⠎]
-  - [Doubleday, ⠠⠙⠳⠃⠇⠫⠁⠽]
-  - [Doubleday's, ⠠⠙⠳⠃⠇⠫⠁⠽⠄⠎]
+  - [Doubleday, ⠠⠙⠳⠃⠇⠑⠐⠙]
+  - [Doubleday's, ⠠⠙⠳⠃⠇⠑⠐⠙⠄⠎]
   - [Doug, ⠠⠙⠳⠛]
   - [Doug's, ⠠⠙⠳⠛⠄⠎]
   - [Douglas, ⠠⠙⠳⠛⠇⠁⠎]
@@ -97567,7 +97567,7 @@ tests:
   - [where, ⠐⠱]
   - [where's, ⠐⠱⠄⠎]
   - [whereabouts, ⠐⠱⠁⠃⠎]
-  - [whereabouts's, ⠐⠱⠁⠃⠳⠞⠎⠄⠎]
+  - [whereabouts's, ⠐⠱⠁⠃⠎⠄⠎]
   - [whereas, ⠐⠱⠁⠎]
   - [whereat, ⠐⠱⠁⠞]
   - [whereby, ⠐⠱⠃⠽]

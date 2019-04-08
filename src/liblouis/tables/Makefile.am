@@ -3,12 +3,14 @@
 table_files = \
 	afr-za-g1.ctb \
 	ar-ar-g1.utb \
-	ar-fa.utb \
+	ar-ar-g2.ctb \
+	ar-ar-comp8.utb \
 	ar.tbl \
 	as-in-g1.utb \
 	as.tbl \
 	awa.tbl \
 	aw-in-g1.utb \
+	spaces.uti \
 	be-in-g1.utb \
 	bengali.cti \
 	bg.ctb \
@@ -58,26 +60,23 @@ table_files = \
 	da-dk-g28l.ctb \
 	da-dk-octobraille.dis \
 	da-lt.ctb \
-	de-ch-accents.cti \
+	de-accents.cti \
+	de-accents-detailed.cti \
 	de-chardefs6.cti \
 	de-chardefs8.cti \
 	de-chess.ctb \
-	de-ch-g0.utb \
-	de-ch-g1.ctb \
-	de-ch-g2.ctb \
-	de_CH.tbl \
-	de-de-accents.cti \
 	de-de-comp8.ctb \
 	de-de.dis \
-	de-de-g0.utb \
-	de-de-g1.ctb \
-	de-de-g2.ctb \
 	de-eurobrl6.dis \
 	de-eurobrl6u.dis \
 	de-g0-core.uti \
+	de-g0.utb \
 	de-g1-core.cti \
+	de-g1-core-patterns.dic \
+	de-g1.ctb \
 	de-g2-core.cti \
-	de.tbl \
+	de-g2-core-patterns.dic \
+	de-g2.ctb \
 	devanagari.cti \
 	digits6DotsPlusDot6.uti \
 	digits6Dots.uti \
@@ -114,12 +113,11 @@ table_files = \
 	eo.tbl \
 	es-chardefs.cti \
 	Es-Es-G0.utb \
-	Es-Es-g1.utb \
 	es-g1.ctb \
+	es-g2.ctb \
 	es-new.dis \
 	es-old.dis \
 	es.tbl \
-	es-translation.cti \
 	et.ctb \
 	et-g0.utb \
 	ethio-g1.ctb \
@@ -233,8 +231,6 @@ table_files = \
 	lv.tbl \
 	malayalam.cti \
 	mao-nz-g1.ctb \
-	marburg.ctb \
-	marburg_edit.ctb \
 	marburg_single_cell_defs.cti \
 	marburg_unicode_defs.cti \
 	ml-in-g1.utb \
@@ -253,9 +249,7 @@ table_files = \
 	mwr.ctb \
 	mwr.tbl \
 	ne.ctb \
-	nemeth.ctb \
 	nemethdefs.cti \
-	nemeth_edit.ctb \
 	ne.tbl \
 	nl-BE.dis \
 	nl-BE-g0.utb \
@@ -324,7 +318,6 @@ table_files = \
 	sl-si-g1.utb \
 	sl.tbl \
 	sot-za-g1.ctb \
-	spaces.ctb \
 	sr-chardefs.cti \
 	sr-g1.ctb \
 	sr.tbl \
@@ -341,17 +334,18 @@ table_files = \
 	text_nabcc.dis \
 	tr.ctb \
 	tr-g1.ctb \
+	tr-g2.ctb \
+	tr-g2.tbl \
 	tr.tbl \
 	tsn-za-g1.ctb \
 	uk.utb \
 	ukchardefs.cti \
-	ukmaths.ctb \
-	ukmaths_edit.ctb \
 	ukmaths_single_cell_defs.cti \
 	ukmaths_unicode_defs.cti \
 	unicode-braille.utb \
 	unicodedefs.cti \
 	unicode.dis \
+	unicode-without-blank.dis \
 	uni-text.dis \
 	ur-pk-g1.utb \
 	ur-pk-g2.ctb \
@@ -360,10 +354,10 @@ table_files = \
 	vi-g1.ctb \
 	vi.tbl \
 	wiskunde-chardefs.cti \
-	wiskunde.ctb \
-	wiskunde-translation.cti \
 	zh-chn.ctb \
 	zh_CHN.tbl \
+	zhcn-g1.ctb \
+	zhcn-g2.ctb \
 	zh-hk.ctb \
 	zh_HK.tbl \
 	zh-tw.ctb \

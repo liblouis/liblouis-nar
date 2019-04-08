@@ -1,4 +1,4 @@
-display: unicode.dis
+display: unicode-without-blank.dis
 table:
   locale: da
   grade: 1
@@ -434,8 +434,8 @@ tests:
 #caps and mixed case
   - ["⠨⠋⠕⠕⠃⠁⠗", "Foobar"]
   - ["⠸⠋⠕⠕⠃⠁⠗", "FOOBAR"]
-  - ["⠸⠋⠕⠕⢠⢠⠃⠁⠗", "FOObar"]
-  - ["⠸⠋⠕⠕⠤⠃⠁⠗⠋⠸⠕⠕⢠⢠⠃⠁⠗", "FOO-barfOObar"]
+  - ["⠸⠋⠕⠕⠠⠃⠁⠗", "FOObar"]
+  - ["⠸⠋⠕⠕⠤⠃⠁⠗⠋⠸⠕⠕⠠⠃⠁⠗", "FOO-barfOObar"]
 
 # Percent and permille
 

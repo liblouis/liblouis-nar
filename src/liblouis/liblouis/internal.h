@@ -121,20 +121,24 @@ typedef enum {
 	CTC_SeqDelimiter = 0x2000,
 	CTC_SeqBefore = 0x4000,
 	CTC_SeqAfter = 0x8000,
-	CTC_UserDefined0 = 0x10000,
+	CTC_UserDefined0 = 0x10000,  // class 5
 	CTC_UserDefined1 = 0x20000,
 	CTC_UserDefined2 = 0x40000,
 	CTC_UserDefined3 = 0x80000,
 	CTC_UserDefined4 = 0x100000,
 	CTC_UserDefined5 = 0x200000,
 	CTC_UserDefined6 = 0x400000,
-	CTC_UserDefined7 = 0x800000,
+	CTC_UserDefined7 = 0x800000,  // class 12
 	CTC_CapsMode = 0x1000000,
 	CTC_NumericMode = 0x2000000,
 	CTC_NumericNoContract = 0x4000000,
 	CTC_EndOfInput = 0x8000000,  // only used by pattern matcher
 	CTC_EmpMatch = 0x10000000,   // only used in TranslationTableRule->before and
 								 // TranslationTableRule->after
+	CTC_MidEndNumericMode = 0x20000000,
+	// two more bits available in a unsigned int of width 32
+	// currently used for class 13 and 14
+	CTC_Class13 = 0x40000000,
 } TranslationTableCharacterAttribute;
 
 typedef enum {
@@ -242,6 +246,7 @@ typedef enum { /* Op codes */
 	CTO_NoLetsignAfter,
 	CTO_NumberSign,
 	CTO_NumericModeChars,
+	CTO_MidEndNumericModeChars,
 	CTO_NumericNoContractChars,
 	CTO_SeqDelimiter,
 	CTO_SeqBeforeChars,
@@ -796,6 +801,12 @@ void EXPORT_CALL
 _lou_logMessage(logLevels level, const char *format, ...);
 
 extern int translation_direction;
+
+/**
+ * Return 1 if given translation mode is valid. Return 0 otherwise.
+ */
+int EXPORT_CALL
+_lou_isValidMode(int mode);
 
 #ifdef __cplusplus
 }
