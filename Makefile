@@ -15,7 +15,7 @@ clean :
 	$(MVN) clean
 
 compile-linux : $(TARGET_NAR_LINUX_32) $(TARGET_NAR_LINUX_64)
-compile-macosx : $(TARGET_NAR_MAC_32) $(TARGET_NAR_MAC_64)
+compile-macosx : $(TARGET_NAR_MAC_64)
 compile-windows : $(TARGET_NAR_WIN_32) $(TARGET_NAR_WIN_64)
 
 $(TARGET_NAR_LINUX_32) :
