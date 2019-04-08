@@ -51,3 +51,6 @@ release :
 	       -DserverId=sonatype-nexus-staging \
 	       -DstagingDescription='$(VERSION)' \
 	       -DkeepStagingRepositoryOnCloseRuleFailure=true
+
+install :
+	$(MVN) nar:nar-package jar:jar install:install
