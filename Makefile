@@ -40,11 +40,11 @@ $(TARGET_NAR_WIN_64) :
 
 snapshot :
 	[[ $(VERSION) == *-SNAPSHOT ]]
-	$(MVN) nar:nar-package install:install deploy:deploy
+	$(MVN) nar:nar-prepare-package nar:nar-package install:install deploy:deploy
 
 release :
 	[[ $(VERSION) != *-SNAPSHOT ]]
-	$(MVN) nar:nar-package jar:jar gpg:sign install:install \
+	$(MVN) nar:nar-prepare-package nar:nar-package jar:jar gpg:sign install:install \
 	       org.sonatype.plugins:nexus-staging-maven-plugin:1.6.8:deploy \
 	       -Psonatype-deploy \
 	       -DnexusUrl=https://oss.sonatype.org/ \
@@ -53,4 +53,4 @@ release :
 	       -DkeepStagingRepositoryOnCloseRuleFailure=true
 
 install :
-	$(MVN) nar:nar-package jar:jar install:install
+	$(MVN) nar:nar-prepare-package nar:nar-package jar:jar install:install
