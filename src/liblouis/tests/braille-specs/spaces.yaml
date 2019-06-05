@@ -1,4 +1,7 @@
-display: spaces.dis
+display: |
+  include unicode-without-blank.dis
+  display 9 9
+  display a a
 
 table: Es-Es-G0.utb,spaces.uti
 flags: {testmode: bothDirections}
@@ -586,16 +589,6 @@ tests:
   - ['\x200b', '\x0020']
   - ['\x200b', '\x0020']
   - ['\x202f', '\x0020']
-table: en-us-comp6.ctb,spaces.uti
-flags: {testmode: bothDirections}
-tests:
-  - ['\x0009', '⡀']
-  - ['\x000a', '⣀']
-  - ['\x0020', '\x0020']
-  - ['\x00a0', 'a']
-flags: {testmode: forward}
-tests:
-  - ['\x000d', '\x0020']
 table: en-us-comp8.ctb,spaces.uti
 flags: {testmode: bothDirections}
 tests:
@@ -2267,19 +2260,6 @@ tests:
 flags: {testmode: forward}
 tests:
   - ['\x000d', '\x0020']
-table: zh_TW.tbl
-flags: {testmode: bothDirections}
-tests:
-  - ['\x0009', '9']
-  - ['\x000a', '⣀']
-  - ['\x000c', '⡘⠇']
-  - ['\x0020', '\x0020']
-  - ['\x00a0', 'a']
-flags: {testmode: forward}
-tests:
-  - ['\x000d', '\x0020']
-  - ['\x2028', '⠳']
-  - ['\x202f', '\x0020']
 table: zhcn-g1.ctb
 flags: {testmode: bothDirections}
 tests:

@@ -7,5 +7,5 @@
 	remote = git@github.com:liblouis/liblouis.git
 	branch = master
 	commit = d6daa923a478181dbffa7cd72535626b0ebd2805
-	parent = c7a123273d7b3cc1f5151c2298e4c3f34cc2f958
+	parent = 1868eda1d27c7b77fd4152d5245692844ad16151
 	cmdver = 0.3.1

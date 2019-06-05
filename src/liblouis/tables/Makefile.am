@@ -27,7 +27,7 @@ table_files = \
 	ca-chardefs.cti \
 	ca-g1.ctb \
 	ca.tbl \
-	chardefs.cti \
+	en-chardefs.cti \
 	chr-us-g1.ctb \
 	ckb-chardefs.cti \
 	ckb-g1.ctb \
@@ -102,7 +102,7 @@ table_files = \
 	en-us-comp8.ctb \
 	en_US-comp8-ext.tbl \
 	en-us-comp8-ext.utb \
-	en-us-compbrl.ctb \
+	en-us-compbrl.uti \
 	en-us-g1.ctb \
 	en-us-g2.ctb \
 	en-us-interline.ctb \
@@ -164,6 +164,7 @@ table_files = \
 	hu-backtranslate-correction.dis \
 	hu-chardefs.cti \
 	hu-exceptionwords.cti \
+	hu-hu-g1_braille_input.cti \
 	hu-hu-comp8.ctb \
 	hu-hu-g1.ctb \
 	hu-hu-g2.ctb \

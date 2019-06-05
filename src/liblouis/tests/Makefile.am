@@ -79,6 +79,7 @@ dist_braille_specs_TESTS =				  \
 	braille-specs/de-ch-g1-dictionary.yaml		  \
 	braille-specs/de-ch-g2-dictionary.yaml		  \
 	braille-specs/de-ch-g1.yaml			  \
+	braille-specs/de-de-comp8.yaml 			  \
 	braille-specs/el-backward.yaml			  \
 	braille-specs/el-forward.yaml			  \
 	braille-specs/en-GB-g2_backward.yaml		  \
@@ -100,6 +101,7 @@ dist_braille_specs_TESTS =				  \
 	braille-specs/en-ueb-math.yaml			  \
 	braille-specs/en-ueb-symbols_harness.yaml	  \
 	braille-specs/en-ueb-michael-robin.yaml		  \
+	braille-specs/en-us-comp6.yaml			  \
 	braille-specs/en-us-comp8-ext-back_harness.yaml	  \
 	braille-specs/en-us-comp8-ext-for_harness.yaml	  \
 	braille-specs/en-us-g2.yaml			  \
@@ -123,8 +125,8 @@ dist_braille_specs_TESTS =				  \
 	braille-specs/hu-hu-comp8_harness.yaml		  \
 	braille-specs/hu-hu-g1_backward.yaml		  \
 	braille-specs/hu-hu-g1_harness.yaml		  \
-	braille-specs/hu-hu-g2_harness.yaml \
-	braille-specs/hu-hu-g2_backward.yaml \
+	braille-specs/hu-hu-g2_harness.yaml 		  \
+	braille-specs/hu-hu-g2_backward.yaml 		  \
 	braille-specs/iu-ca-g1_harness.yaml		  \
 	braille-specs/ko-2006-g2_harness.yaml		  \
 	braille-specs/ko-g2_harness.yaml		  \
@@ -140,6 +142,7 @@ dist_braille_specs_TESTS =				  \
 	braille-specs/no_g1_harness.yaml		  \
 	braille-specs/no_g2_harness.yaml		  \
 	braille-specs/no_harness.yaml			  \
+	braille-specs/no_typeform_harness.yaml		  \
 	braille-specs/pl-pl-comp8_harness.yaml		  \
 	braille-specs/Pl-Pl-g1_backward.yaml		  \
 	braille-specs/sk-g1_harness.yaml		  \
@@ -171,6 +174,7 @@ dist_yaml_TESTS =				\
 	yaml/capsnocont.yaml			\
 	yaml/capsword_for_back.yaml		\
 	yaml/compbrlAtCursor_with_equals.yaml	\
+	yaml/computer_braille.yaml		\
 	yaml/emphasis-full.yaml			\
 	yaml/emphasis-no-context.yaml		\
 	yaml/example_test.yaml			\
@@ -178,6 +182,7 @@ dist_yaml_TESTS =				\
 	yaml/hyphenation_nocross_harness.yaml	\
 	yaml/inpos_outpos.yaml			\
 	yaml/issue-238.yaml			\
+	yaml/issue-332.yaml			\
 	yaml/issue-35.yaml			\
 	yaml/issue-384.yaml			\
 	yaml/issue-400.yaml			\
@@ -196,6 +201,7 @@ dist_yaml_TESTS =				\
 	yaml/multipass-forward.yaml		\
 	yaml/multipass.yaml			\
 	yaml/multipass-negation.yaml		\
+	yaml/multipass-vs-match.yaml		\
 	yaml/new_emph.yaml			\
 	yaml/noletsignafter.yaml		\
 	yaml/noUndefinedDots.yaml		\
