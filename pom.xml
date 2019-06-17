@@ -189,7 +189,7 @@
 							<outputDirectory>target/nar/louis-${project.version}-noarch/</outputDirectory>
 							<resources>
 								<resource>
-									<directory>target/nar/gnu/x86_64-MacOSX-gpp/target/</directory>
+									<directory>target/nar/gnu/${nar.aol}/target/</directory>
 									<includes>
 										<include>share/**/*</include>
 									</includes>
