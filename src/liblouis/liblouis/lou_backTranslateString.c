@@ -192,14 +192,14 @@ _lou_backTranslateWithTracing(const char *tableList, const widechar *inbuf, int 
 		passbuf1 = stringBufferPool->buffers[idx];
 		for (k = 0; k < srcmax; k++)
 			if ((mode & dotsIO))
-				passbuf1[k] = inbuf[k] | 0x8000;
+				passbuf1[k] = inbuf[k] | LOU_DOTS;
 			else
 				passbuf1[k] = _lou_getDotsForChar(inbuf[k]);
 		passbuf1[srcmax] = _lou_getDotsForChar(' ');
-		input = (InString){.chars = passbuf1, .length = srcmax, .bufferIndex = idx };
+		input = (InString){ .chars = passbuf1, .length = srcmax, .bufferIndex = idx };
 	}
 	idx = getStringBuffer(*outlen);
-	output = (OutString){.chars = stringBufferPool->buffers[idx],
+	output = (OutString){ .chars = stringBufferPool->buffers[idx],
 		.maxlength = *outlen,
 		.length = 0,
 		.bufferIndex = idx };
@@ -274,11 +274,11 @@ _lou_backTranslateWithTracing(const char *tableList, const widechar *inbuf, int 
 		currentPass--;
 		if (currentPass >= lastPass && goodTrans) {
 			releaseStringBuffer(input.bufferIndex);
-			input = (InString){.chars = output.chars,
+			input = (InString){ .chars = output.chars,
 				.length = output.length,
 				.bufferIndex = output.bufferIndex };
 			idx = getStringBuffer(*outlen);
-			output = (OutString){.chars = stringBufferPool->buffers[idx],
+			output = (OutString){ .chars = stringBufferPool->buffers[idx],
 				.maxlength = *outlen,
 				.length = 0,
 				.bufferIndex = idx };
@@ -329,11 +329,12 @@ back_findCharOrDots(widechar c, int m, const TranslationTableHeader *table) {
 	/* Look up character or dot pattern in the appropriate
 	 * table. */
 	static TranslationTableCharacter noChar = { 0, 0, 0, CTC_Space, 32, 32, 32 };
-	static TranslationTableCharacter noDots = { 0, 0, 0, CTC_Space, B16, B16, B16 };
+	static TranslationTableCharacter noDots = { 0, 0, 0, CTC_Space, LOU_DOTS, LOU_DOTS,
+		LOU_DOTS };
 	TranslationTableCharacter *notFound;
 	TranslationTableCharacter *character;
 	TranslationTableOffset bucket;
-	unsigned long int makeHash = (unsigned long int)c % HASHNUM;
+	unsigned long int makeHash = _lou_charHash(c);
 	if (m == 0) {
 		bucket = table->characters[makeHash];
 		notFound = &noChar;
@@ -888,31 +889,18 @@ back_updatePositions(const widechar *outChars, int inLength, int outLength,
 
 static int
 undefinedDots(widechar dots, int mode, OutString *output, int pos, int *posMapping) {
-	if (mode & noUndefinedDots) return 1;
-	/* Print out dot numbers */
-	widechar buffer[20];
-	int k = 1;
-	buffer[0] = '\\';
-	if ((dots & B1)) buffer[k++] = '1';
-	if ((dots & B2)) buffer[k++] = '2';
-	if ((dots & B3)) buffer[k++] = '3';
-	if ((dots & B4)) buffer[k++] = '4';
-	if ((dots & B5)) buffer[k++] = '5';
-	if ((dots & B6)) buffer[k++] = '6';
-	if ((dots & B7)) buffer[k++] = '7';
-	if ((dots & B8)) buffer[k++] = '8';
-	if ((dots & B9)) buffer[k++] = '9';
-	if ((dots & B10)) buffer[k++] = 'A';
-	if ((dots & B11)) buffer[k++] = 'B';
-	if ((dots & B12)) buffer[k++] = 'C';
-	if ((dots & B13)) buffer[k++] = 'D';
-	if ((dots & B14)) buffer[k++] = 'E';
-	if ((dots & B15)) buffer[k++] = 'F';
-	buffer[k++] = '/';
-	if ((output->length + k) > output->maxlength) return 0;
-	memcpy(&output->chars[output->length], buffer, k * CHARSIZE);
 	posMapping[pos] = output->length;
-	output->length += k;
+	if (mode & noUndefined) return 1;
+
+	/* Print out dot numbers */
+	const char *buffer = _lou_unknownDots(dots);
+	size_t buflen = strlen(buffer);
+	if ((output->length + buflen) > output->maxlength) return 0;
+
+	for (unsigned int k = 0; k < buflen; k += 1) {
+		output->chars[output->length++] = buffer[k];
+	}
+
 	return 1;
 }
 
@@ -1026,10 +1014,11 @@ makeCorrections(const TranslationTableHeader *table, int mode, int currentPass,
 					currentRule = (TranslationTableRule *)&table->ruleArea[ruleOffset];
 					currentOpcode = currentRule->opcode;
 					int currentCharslen = currentRule->charslen;
-					if (tryThis == 1 || (currentCharslen <= length &&
-												compareChars(&currentRule->charsdots[0],
-														&input->chars[pos],
-														currentCharslen, 0, table))) {
+					if (tryThis == 1 ||
+							(currentCharslen <= length &&
+									compareChars(&currentRule->charsdots[0],
+											&input->chars[pos], currentCharslen, 0,
+											table))) {
 						if (currentOpcode == CTO_Correct &&
 								back_passDoTest(table, pos, input, currentOpcode,
 										currentRule, &passInstructions, &passIC,
