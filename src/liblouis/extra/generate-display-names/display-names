@@ -28,10 +28,12 @@
 * ../../tables/da-dk-g28.ctb                    Danish 8-dot contracted braille
 * ../../tables/da-dk-g28l.ctb                   Danish 8-dot partially contracted braille
 * ../../tables/de-g0.utb                        German uncontracted braille
+* ../../tables/de-g0-bidi.utb                   German uncontracted braille (back-translatable)
 * ../../tables/de-g1.ctb                        German partially contracted braille
+* ../../tables/de-g1-bidi.ctb                   German partially contracted braille (back-translatable)
 * ../../tables/de-g2.ctb                        German contracted braille
 * ../../tables/dra.tbl                          Dravidian computer braille
-* ../../tables/el.tbl                           Greek braille
+* ../../tables/el.ctb                           Greek braille
   ../../tables/grc-international-en.utb         Greek internationalized braille as used by English speakers
 * ../../tables/fa-ir-comp8.ctb                  Persian computer braille
 * ../../tables/fa-ir-g1.utb                     Persian braille
@@ -115,8 +117,9 @@
 * ../../tables/pt-pt-g1.utb                     Portuguese uncontracted braille
 * ../../tables/pt-pt-comp8.ctb                  Portuguese computer braille
 * ../../tables/ro.tbl                           Romanian computer braille
+* ../../tables/ru.ctb                           Russian computer braille
 * ../../tables/ru.tbl                           Russian braille
-* ../../tables/ru-compbrl.ctb                   Russian computer braille
+  ../../tables/ru-compbrl.ctb                   Russian braille for program sources
 * ../../tables/sa.tbl                           Sanskrit braille
 * ../../tables/sd.tbl                           Sindhi braille
 * ../../tables/sv.tbl                           Swedish braille

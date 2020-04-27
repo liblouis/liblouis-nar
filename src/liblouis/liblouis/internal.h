@@ -72,7 +72,13 @@ typedef struct intCharTupple {
 #define MAX_EMPH_CLASSES 10  // {emph_1...emph_10} in typeforms enum (liblouis.h)
 
 typedef unsigned int TranslationTableOffset;
-#define OFFSETSIZE sizeof(TranslationTableOffset)
+
+/* Basic type for translation table data, which carries all alignment
+ * constraints that fields contained in translation table may have.
+ * Notably TranslationTableCharacterAttributes is unsigned long long, so we need
+ * at least this big basic type. */
+typedef unsigned long long TranslationTableData;
+#define OFFSETSIZE sizeof(TranslationTableData)
 
 typedef enum {
 	CTC_Space = 0x1,
@@ -284,6 +290,7 @@ typedef enum { /* Op codes */
 	CTO_Pass4,
 	CTO_Repeated,
 	CTO_RepWord,
+	CTO_RepEndWord,
 	CTO_CapsNoCont,
 	CTO_Always,
 	CTO_ExactDots,
@@ -440,7 +447,8 @@ typedef struct {
 	TranslationTableCharacterAttributes after;  /** character types which must follow */
 	TranslationTableCharacterAttributes before; /** character types which must precede */
 	TranslationTableOffset patterns;			/** before and after patterns */
-	TranslationTableOpcode opcode;		 /** rule for testing validity of replacement */
+	TranslationTableOpcode opcode; /** rule for testing validity of replacement */
+	char nocross;
 	short charslen;						 /** length of string to be replaced */
 	short dotslen;						 /** length of replacement string */
 	widechar charsdots[DEFAULTRULESIZE]; /** find and replacement strings */
@@ -465,12 +473,26 @@ typedef struct /* one state */
 	widechar numTrans;
 } HyphenationState;
 
+typedef struct CharacterClass {
+	struct CharacterClass *next;
+	TranslationTableCharacterAttributes attribute;
+	widechar length;
+	widechar name[1];
+} CharacterClass;
+
+typedef struct RuleName {
+	struct RuleName *next;
+	TranslationTableOffset ruleOffset;
+	widechar length;
+	widechar name[1];
+} RuleName;
+
 typedef struct {
 	TranslationTableOffset tableSize;
 	TranslationTableOffset bytesUsed;
 	TranslationTableOffset charToDots[HASHNUM];
 	TranslationTableOffset dotsToChar[HASHNUM];
-	TranslationTableOffset ruleArea[1]; /** Space for storing all rules and values */
+	TranslationTableData ruleArea[1]; /** Space for storing all rules and values */
 } DisplayTableHeader;
 
 /**
@@ -499,6 +521,11 @@ typedef struct { /* translation table */
 	/* emphRules, including caps. */
 	TranslationTableOffset emphRules[MAX_EMPH_CLASSES + 1][9];
 
+	/* state needed during compilation */
+	CharacterClass *characterClasses;
+	TranslationTableCharacterAttributes nextCharacterClassAttribute;
+	RuleName *ruleNames;
+
 	TranslationTableOffset begComp;
 	TranslationTableOffset compBegEmph1;
 	TranslationTableOffset compEndEmph1;
@@ -525,7 +552,7 @@ typedef struct { /* translation table */
 	TranslationTableOffset backPassRules[MAXPASS + 1];
 	TranslationTableOffset forRules[HASHNUM];  /** chains of forward rules */
 	TranslationTableOffset backRules[HASHNUM]; /** Chains of backward rules */
-	TranslationTableOffset ruleArea[1]; /** Space for storing all rules and values */
+	TranslationTableData ruleArea[1]; /** Space for storing all rules and values */
 } TranslationTableHeader;
 
 typedef enum {
@@ -622,17 +649,31 @@ _lou_defaultTableResolver(const char *tableList, const char *base);
  * TODO: move to commonTranslationFunctions.c
  */
 widechar EXPORT_CALL
-_lou_getDotsForChar(widechar c);
+_lou_getDotsForChar(widechar c, const DisplayTableHeader *table);
 
 /**
  * Return character corresponding to a single-cell dot pattern.
  * TODO: move to commonTranslationFunctions.c
  */
 widechar EXPORT_CALL
-_lou_getCharFromDots(widechar d);
+_lou_getCharFromDots(widechar d, const DisplayTableHeader *table);
 
-DisplayTableHeader *EXPORT_CALL
-_lou_getCurrentDisplayTable();
+void EXPORT_CALL
+_lou_getTable(const char *tableList, const char *displayTableList,
+		const TranslationTableHeader **translationTable,
+		const DisplayTableHeader **displayTable);
+
+const TranslationTableHeader *EXPORT_CALL
+_lou_getTranslationTable(const char *tableList);
+
+const DisplayTableHeader *EXPORT_CALL
+_lou_getDisplayTable(const char *tableList);
+
+int EXPORT_CALL
+_lou_compileTranslationRule(const char *tableList, const char *inString);
+
+int EXPORT_CALL
+_lou_compileDisplayRule(const char *tableList, const char *inString);
 
 /**
  * Allocate memory for internal buffers
@@ -729,16 +770,16 @@ int EXPORT_CALL
 _lou_extParseDots(const char *inString, widechar *outString);
 
 int EXPORT_CALL
-_lou_translateWithTracing(const char *tableList, const widechar *inbuf, int *inlen,
-		widechar *outbuf, int *outlen, formtype *typeform, char *spacing, int *outputPos,
-		int *inputPos, int *cursorPos, int mode, const TranslationTableRule **rules,
-		int *rulesLen);
+_lou_translate(const char *tableList, const char *displayTableList, const widechar *inbuf,
+		int *inlen, widechar *outbuf, int *outlen, formtype *typeform, char *spacing,
+		int *outputPos, int *inputPos, int *cursorPos, int mode,
+		const TranslationTableRule **rules, int *rulesLen);
 
 int EXPORT_CALL
-_lou_backTranslateWithTracing(const char *tableList, const widechar *inbuf, int *inlen,
-		widechar *outbuf, int *outlen, formtype *typeform, char *spacing, int *outputPos,
-		int *inputPos, int *cursorPos, int mode, const TranslationTableRule **rules,
-		int *rulesLen);
+_lou_backTranslate(const char *tableList, const char *displayTableList,
+		const widechar *inbuf, int *inlen, widechar *outbuf, int *outlen,
+		formtype *typeform, char *spacing, int *outputPos, int *inputPos, int *cursorPos,
+		int mode, const TranslationTableRule **rules, int *rulesLen);
 
 void EXPORT_CALL
 _lou_resetPassVariables(void);
