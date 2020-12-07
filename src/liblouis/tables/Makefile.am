@@ -4,13 +4,16 @@ table_files = \
 	afr-za-g1.ctb \
 	afr-za-g2.ctb \
 	ar-ar-comp8.utb \
+	ar-ar-g1-core.uti \
 	ar-ar-g1.utb \
 	ar-ar-g2.ctb \
+	ar-ar-math.uti \
 	ar.tbl \
 	as-in-g1.utb \
 	as.tbl \
 	awa.tbl \
 	aw-in-g1.utb \
+	ba.utb \
 	be-in-g1.utb \
 	bengali.cti \
 	bg.ctb \
@@ -34,6 +37,7 @@ table_files = \
 	ckb-translation.cti \
 	compress.cti \
 	controlchars.cti \
+	cop-eg-comp8.utb \
 	corrections.cti \
 	countries.cti \
 	cs-chardefs.cti \
@@ -47,7 +51,6 @@ table_files = \
 	cy.tbl \
 	da-dk-6miscChars.cti \
 	da-dk-8miscChars.cti \
-	da-dk.dis \
 	da-dk-g08.ctb \
 	da-dk-g16.ctb \
 	da-dk-g16-lit.ctb \
@@ -59,7 +62,6 @@ table_files = \
 	da-dk-g28.ctb \
 	da-dk-g28l.ctb \
 	da-dk-octobraille.dis \
-	da-lt.ctb \
 	de-accents.cti \
 	de-accents-detailed.cti \
 	de-chardefs6.cti \
@@ -108,6 +110,7 @@ table_files = \
 	en_US-comp8-ext.tbl \
 	en-us-comp8-ext.utb \
 	en-us-compbrl.uti \
+	en-us-emphasis.uti \
 	en-us-g1.ctb \
 	en-us-g2.ctb \
 	en-us-interline.ctb \
@@ -130,8 +133,6 @@ table_files = \
 	eurodefs.cti \
 	fa-ir-comp8.ctb \
 	fa-ir-g1.utb \
-	fi1.ctb \
-	fi2.ctb \
 	fi-fi-8dot.ctb \
 	fi.utb \
 	fr-bfu-comp68.cti \
@@ -157,6 +158,8 @@ table_files = \
 	haw-us-g1.ctb \
 	he.ctb \
 	he.tbl \
+	he-IL.utb \
+	he-IL-comp8.utb \
 	hi-in-g1.utb \
 	hi.tbl \
 	hr-chardefs.cti \
@@ -248,6 +251,7 @@ table_files = \
 	mn-MN-g2.ctb \
 	mr-in-g1.utb \
 	mr.tbl \
+	ms-my-g2.ctb \
 	mt.ctb \
 	mt.tbl \
 	mun.ctb \
@@ -302,9 +306,8 @@ table_files = \
 	ru.ctb \
 	ru-letters.dis \
 	ru-litbrl.ctb \
+	ru-litbrl-detailed.utb \
 	ru-ru.dis \
-	ru-ru-g1.utb \
-	ru.tbl \
 	ru-unicode.dis \
 	sa-in-g1.utb \
 	sa.tbl \
@@ -350,6 +353,7 @@ table_files = \
 	ukmaths_single_cell_defs.cti \
 	ukmaths_unicode_defs.cti \
 	uk.utb \
+	uk-comp.utb \
 	unicode-braille.utb \
 	unicode.dis \
 	unicode-without-blank.dis \
@@ -357,6 +361,7 @@ table_files = \
 	ur-pk-g1.utb \
 	ur-pk-g2.ctb \
 	us-table.dis \
+	uz-g1.utb \
 	vi.ctb \
 	vi-g1.ctb \
 	vi.tbl \

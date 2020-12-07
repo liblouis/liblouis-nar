@@ -56,6 +56,8 @@ seqdelimiter ‐   \x2010
 seqdelimiter ‑   \x2011
 seqdelimiter –   \x2013
 seqdelimiter —   \x2014
+seqdelimiter ―   \x2015
+
 seqbeforechars ([{"“'‘
 seqafterchars  )]}"”'’.,;:.!?…
 seqafterpattern 'd
@@ -645,7 +647,7 @@ sufword strawhat 34-1235-1-2456-125-1-2345
 #   - 10.5.4   enough in
 
 attribute 1 +=*,.;:?!"'“”‘’  punctuation with only lower dots (except hyphens)
-#class lowerdotspunc +=*,.?!"'“”‘’
+#attribute lowerdotspunc +=*,.?!"'“”‘’
 
 # be
 match %[^_]|%[^_~]%<*[([{] be %[^_]|[)}\\]]%>*%[^_~] 23
@@ -1365,6 +1367,7 @@ sufword dupont 145-136-1234-135-1345-2345
 always where 5-156
 
 sufword where'er 156-12456-15-3-12456
+sufword where’er 156-12456-15-3-12456
 sufword whereupon 5-156-45-136
 sufword wherever 156-12456-5-15
 

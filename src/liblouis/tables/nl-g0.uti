@@ -132,7 +132,7 @@ replace  \\_
 # nocontractsign 6
 # numericnocontchars abcdefghij
 
-class digitletter abcdefghijABCDEFGHIJ    # 1st class = $w
+attribute digitletter abcdefghijABCDEFGHIJ    # 1st class = $w
 noback context     $d[]%digitletter       @6
 noback context     $d","[]%digitletter    @6
 noback context     $d"."[]%digitletter    @6
@@ -155,8 +155,8 @@ noback pass3       $d[@6]@456             ?
 # When a PLUS SIGN appears within a word (e.g. 30+'er) it must be preceded by a
 # "second meaning" sign because its first meaning is EXCLAMATION MARK.
 
-class    plusamp                     +&     # 2nd class = $x
-class    noplusamp                   .'‘’   # 3rd class = $y
+attribute    plusamp                     +&     # 2nd class = $x
+attribute    noplusamp                   .'‘’   # 3rd class = $y
 noback pass4    %noplusamp[]%plusamp        @5
 noback pass4    $l[]%plusamp                @5
 noback pass4    [@235a]%plusamp             @235-5
@@ -200,7 +200,18 @@ emphletter underline 456
 # and ’ (RIGHT SINGLE QUOTATION MARK).
 capsmodechars +&.'‘’
 # The same goes for the emphasis "state".
-emphmodechars +&.'
+emphmodechars italic +&.'
+emphmodechars bold +&.'
+emphmodechars underline +&.'
+
+# These are the characters for which emphasis is not indicated
+noemphchars italic \s'()
+noemphchars bold \s'()
+noemphchars underline \s'()
+
+# treat apostrophe in 't as a letter
+letter \xe000 3
+noback correct ["'"]"t"$s "\xe000"
 
 lencapsphrase 4
 begcapsword 45
