@@ -81,7 +81,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<gnuSourceDirectory>target/generated-sources/liblouis</gnuSourceDirectory>
-					<gnuConfigureArgs>--with-yaml=no ${nar.host.option}</gnuConfigureArgs>
+					<gnuConfigureArgs>--enable-ucs4 --with-yaml=no ${nar.host.option}</gnuConfigureArgs>
 					<libraries>
 						<library>
 							<type>shared</type>
