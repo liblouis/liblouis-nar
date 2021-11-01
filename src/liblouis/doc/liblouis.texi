@@ -877,7 +877,7 @@ English Braille (UEB). In Liblouis, a letter or letters-sequence is
 considered to be @emph{standing alone} if it is preceded and followed
 by a space, and/or other characters that you choose as delimiters,
 e.g. @samp{-}. A @emph{standing alone} sequence can be thought of as a
-word in a very broad sence. With the opcodes described in this
+word in a very broad sense. With the opcodes described in this
 section, you can decide what characters constitute a delimiter, and
 what characters can attach to the beginning or end of a word or
 @emph{standing alone} sequence.
@@ -1028,7 +1028,7 @@ specific combination of indicators that are defined in the table.
 Many languages simply have an indicator for the beginning of emphasis
 and another one for the end of the emphasis. The emphasis is
 ``permanent'' in the sense that it needs an end indicator to cancel
-it. It is not implicitly cancelled by any character or space.
+it. It is not implicitly canceled by any character or space.
 
 Characters that are defined as @emph{not emphasizable} in braille
 (@pxopref{noemphchars}) are not indicated as such by Liblouis. This
@@ -1085,7 +1085,7 @@ noemphchars italic \s'()
 
 Some languages have special indicators for single letter emphasis. The
 letter indicator will be chosen over other indicators when the next
-character is emphasised, but not the characters thereafter.
+character is emphasized, but not the characters thereafter.
 
 In some situations the letter indicator is the only way to indicate
 emphasis. For instance when emphasis ends within the middle of a word,
@@ -1117,7 +1117,7 @@ of a word indicator is normally until the next unemphasizable
 character, however this can be changed with the @code{emphmodechars}
 opcode (@pxopref{noemphchars} and @opref{emphmodechars}).
 
-Word emphasis can also be cancelled with an explicit closing
+Word emphasis can also be canceled with an explicit closing
 indicator. Usually a word indicator is put at the the beginning of the
 word, but it may also be used for cases where the emphasis starts in
 the middle of the word.
@@ -1267,6 +1267,25 @@ computer braille indicators are applied not only when computer braille
 is indicated in the @code{typeform} parameter, but also when a
 sequence of characters is determined to be computer braille because it
 contains a subsequence defined by the @opcoderef{compbrl}.
+
+@table @code
+@opcode{begcomp, dots}
+
+This braille indicator is placed before a sequence of characters
+translated in computer braille, whether this sequence is indicated in
+the @code{typeform} parameter (@pxref{typeform
+parameter,typeform,@code{typeform} parameter}) or inferred because it
+contains a subsequence specified by the @opcoderef{compbrl}.
+
+@opcode{endcomp, dots}
+
+This braille indicator is placed after a sequence of characters
+translated in computer braille, whether this sequence is indicated in
+the @code{typeform} parameter (@pxref{typeform
+parameter,typeform,@code{typeform} parameter}) or inferred because it
+contains a subsequence specified by the @opcoderef{compbrl}.
+
+@end table
 
 @node Special Symbol Opcodes
 @section Special Symbol Opcodes
@@ -2096,6 +2115,13 @@ lowercase
 punctuation
 @item $
 sign
+@item ~
+seqdelimiter
+@item <
+seqbeforechars
+@item >
+seqafterchars
+ 
 @end table
 
 @item ^
@@ -3107,7 +3133,7 @@ without the optional flags. This is useful e.g. if you want to have
 various tests for both forward and backward translation for the same
 set of tables, especially if you are defining the table as part of
 the yaml file (see next section). This feature is also useful if you
-simply want to devide your tests into multiple sections for better
+simply want to divide your tests into multiple sections for better
 overview. All flags are reset to their default values when you start
 a new test section.
 
@@ -3253,7 +3279,7 @@ their output in this form. The input to the compiler (tables) is
 unaffected except that two new escape sequences for 20-bit and 32-bit
 characters are recognized.
 
-At runtime, the width of a character specified during compilation may
+At run time, the width of a character specified during compilation may
 be obtained using @code{lou_charSize}.
 
 Here are the definitions of the eleven liblouis functions and their
@@ -3428,6 +3454,7 @@ pointers to integers. When the function is called, these integers
 contain the maximum input and output lengths, respectively. When it
 returns, they are set to the actual lengths used.
 
+@anchor{typeform parameter}
 The @code{typeform} parameter is used to indicate italic type,
 boldface type, computer braille, etc. It is an array of @code{formtype}
 with the same length as the input buffer pointed to by @code{*inbuf}.
@@ -4031,9 +4058,7 @@ directory. Usage information is included in the Python module itself.
 @c  LocalWords:  lastworditalafter lastletterital firstwordbold UTF
 @c  LocalWords:  singleletterital lastwordboldbefore lastwordboldafter
 @c  LocalWords:  firstletterbold lastletterbold lenboldphrase filll
-@c  LocalWords:  singleletterbold firstwordunder lastwordunderbefore
-@c  LocalWords:  lastwordunderafter firstletterunder lastletterunder
-@c  LocalWords:  singleletterunder lenunderphrase begcomp endcomp decpoint texi
+@c  LocalWords:  begcomp endcomp decpoint texi opref pxopref el xyz
 @c  LocalWords:  capsnocont noback nofor texinfo setfilename settitle direntry
 @c  LocalWords:  dircategory finalout defindex opcodeindex noindent uref vskip
 @c  LocalWords:  titlepage insertcopying ifnottex dir detailmenu italword RET
@@ -4057,9 +4082,13 @@ directory. Usage information is included in the Python module itself.
 @c  LocalWords:  abrege decrement pre cornf comf scano cornm cornp po
 @c  LocalWords:  h's brl testtrans UCS asis libyaml url yaml formtype
 @c  LocalWords:  testmode iftex unicode ueb xfail eo noContractions
-@c  LocalWords:  dotsIO ucBrl noUndefined partialTrans capsletter
+@c  LocalWords:  dotsIO ucBrl noUndefined partialTrans capsletter bb
 @c  LocalWords:  abc doctest inString enum cp outbufbuf logcallback fprint
 @c  LocalWords:  lbu EOF heckTable fn ispell getTypeformForEmphClass
 @c  LocalWords:  indexTables begcapsword endcapsword typeforms tasik
 @c  LocalWords:  endemphphraseopcode emphClass BrailleSense HumanWare
-@c  LocalWords:  BrailleNote refreshable
+@c  LocalWords:  BrailleNote refreshable capsmodechars seqdelimiter
+@c  LocalWords:  numericmodechars noemphchars emphmodechars abxyzcd
+@c  LocalWords:  subsequence issuecomment uncontracted rependword ing
+@c  LocalWords:  discoverable bothDirections hyphenateBraille
+@c  LocalWords:  maxOutputLength subdirectories

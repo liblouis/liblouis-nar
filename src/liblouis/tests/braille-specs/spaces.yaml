@@ -575,7 +575,6 @@ tests:
   - ['\x2008', '\x0020']
   - ['\x200a', '\x0020']
   - ['\x200b', '\x0020']
-  - ['\x200b', '\x0020']
   - ['\x202f', '\x0020']
 table: en-us-comp8.ctb,spaces.uti
 flags: {testmode: bothDirections}
@@ -921,7 +920,7 @@ tests:
   - ['\x200b', '\x0020']
   - ['\x202f', '\x0020']
   - ['\x202f', '\x0020']
-table: he.tbl,spaces.uti
+table: he-IL-comp8.utb,spaces.uti
 flags: {testmode: bothDirections}
 tests:
   - ['\x0020', '\x0020']
@@ -2004,16 +2003,6 @@ tests:
   - ['\x0020', '\x0020']
 flags: {testmode: forward}
 tests:
-  - ['\x00a0', '\x0020']
-table: vi.tbl
-flags: {testmode: bothDirections}
-tests:
-  - ['\x0020', '\x0020']
-flags: {testmode: forward}
-tests:
-  - ['\x0009', '\x0020']
-  - ['\x000a', '\x0020']
-  - ['\x000d', '\x0020']
   - ['\x00a0', '\x0020']
 table: zh_CHN.tbl
 flags: {testmode: bothDirections}
