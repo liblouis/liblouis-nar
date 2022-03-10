@@ -16,7 +16,7 @@
 
 display: ru-unicode.dis
 table:
-  locale: uz
+  language: uz
   type: literary
 tests:
   - # Sample for testing "ғ" and "ў"
@@ -44,8 +44,12 @@ tests:
     - g‘g`g’
     - ⠻⠻⠻
   - # Various symbols
-    - ° % () {} []
-    - ⠨⠴⠀⠼⠚⠴⠀⠶⠶⠀⠣⠜⠀⠣⠜
+    - () {} []
+    - ⠶⠶⠀⠣⠜⠀⠣⠜
+  - - 5 %
+    - ⠼⠑⠼⠚⠴
+  - - 90 °
+    - ⠼⠊⠚⠨⠴
   - # When writing Roman numbers, the capital sign (46) is placed only at the beginning of the number (1).
     - VII
     - ⠨⠺⠊⠊

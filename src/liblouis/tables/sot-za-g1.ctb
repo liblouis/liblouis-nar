@@ -24,7 +24,7 @@
 # License along with liblouis. If not, see
 # <http://www.gnu.org/licenses/>.
 
-#+locale: st
+#+language: st
 #+type: literary
 #+contraction: no
 #+grade: 1
@@ -66,6 +66,8 @@
 # identical to UEB.
 
 # Diacritic character used in Sesotho
-uplow \x0160\x0161 4-234 Šš
+
+lowercase \x0161 4-234 š
+base uppercase \x0160 \x0161 Šš
 
 include en-ueb-g1.ctb

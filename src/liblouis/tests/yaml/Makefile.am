@@ -23,7 +23,10 @@ EXTRA_DIST =					\
 	issue-332_hyph.dic			\
 	issue-479.yaml				\
 	issue-615.yaml				\
+	issue-963.yaml				\
 	letterDefTest_harness.yaml		\
+	macro.yaml				\
+	macro.utb				\
 	multipass-backward.yaml			\
 	multipass-forward.yaml			\
 	multipass.yaml				\
@@ -34,6 +37,7 @@ EXTRA_DIST =					\
 	noletsignafter.yaml			\
 	numericmode.yaml			\
 	pass0_typebuf.yaml			\
+	precedence.yaml				\
 	present_progressive.yaml		\
 	repword.yaml				\
 	squash_space.yaml			\

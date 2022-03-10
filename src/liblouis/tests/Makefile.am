@@ -92,16 +92,18 @@ dist_braille_specs_TESTS =				  \
 	braille-specs/da-dk-g28-dictionary_harness.yaml	  \
 	braille-specs/da-dk-g28.yaml			  \
 	braille-specs/da-dk-g28l.yaml			  \
+	braille-specs/de-comp6.yaml			  \
 	braille-specs/de-de-comp8.yaml 			  \
 	braille-specs/de-eurobrl6.yaml			  \
-	braille-specs/de-g0-bidi-dictionary.yaml	  \
-	braille-specs/de-g0-bidi-specs.yaml		  \
+	braille-specs/de-g0-detailed-dictionary.yaml	  \
+	braille-specs/de-g0-detailed-specs.yaml		  \
 	braille-specs/de-g0.yaml			  \
-	braille-specs/de-g1-bidi-dictionary.yaml	  \
-	braille-specs/de-g1-bidi-specs.yaml		  \
+	braille-specs/de-g1-detailed-dictionary.yaml	  \
+	braille-specs/de-g1-detailed-specs.yaml		  \
 	braille-specs/de-g1.yaml			  \
 	braille-specs/de-g1-dictionary.yaml		  \
 	braille-specs/de-g2.yaml			  \
+	braille-specs/de-g2-sbs.yaml			  \
 	braille-specs/de-g2-dictionary.yaml		  \
 	braille-specs/el-backward.yaml			  \
 	braille-specs/el-forward.yaml			  \
@@ -154,9 +156,14 @@ dist_braille_specs_TESTS =				  \
 	braille-specs/hu-hu-comp8_harness.yaml		  \
 	braille-specs/hu-hu-g1_backward.yaml		  \
 	braille-specs/hu-hu-g1_harness.yaml		  \
+	braille-specs/hu-hu-g1_braille_input_backward.yaml\
+	braille-specs/hu-hu-g1_braille_input_forward.yaml \
+	braille-specs/hu-hu-g1-numbers.yaml		  \
 	braille-specs/hu-hu-g2_harness.yaml 		  \
 	braille-specs/hu-hu-g2_backward.yaml 		  \
+	braille-specs/hu-hu-g2-numbers.yaml		  \
 	braille-specs/iu-ca-g1_harness.yaml		  \
+	braille-specs/ja-kantenji.yaml			  \
 	braille-specs/kk.yaml				  \
 	braille-specs/kmr.yaml				  \
 	braille-specs/ko-2006-g2_harness.yaml		  \
@@ -169,7 +176,6 @@ dist_braille_specs_TESTS =				  \
 	braille-specs/mn-MN_harness.yaml		  \
 	braille-specs/ms-my-g2.yaml			  \
 	braille-specs/nl-comp8_harness.yaml		  \
-	braille-specs/nl-NL-g0_harness.yaml		  \
 	braille-specs/nl-g0_harness.yaml		  \
 	braille-specs/no_8dot_harness.yaml		  \
 	braille-specs/no_backward.yaml			  \
@@ -228,6 +234,7 @@ dist_yaml_TESTS =				\
 	yaml/issue-332.yaml			\
 	yaml/issue-479.yaml			\
 	yaml/issue-615.yaml			\
+	yaml/issue-963.yaml			\
 	yaml/letterDefTest_harness.yaml		\
 	yaml/multipass-backward.yaml		\
 	yaml/multipass-forward.yaml		\
@@ -239,6 +246,7 @@ dist_yaml_TESTS =				\
 	yaml/numericmode.yaml			\
 	yaml/partialTrans.yaml			\
 	yaml/pass0_typebuf.yaml			\
+	yaml/precedence.yaml			\
 	yaml/present_progressive.yaml		\
 	yaml/repword.yaml			\
 	yaml/squash_space.yaml			\
@@ -252,6 +260,12 @@ dist_yaml_TESTS +=				\
 	yaml/face-with-tears-of-joy-ucs4.yaml
 endif
 
+# Tests for macros
+if ENABLE_MACROS
+dist_yaml_TESTS +=				\
+	yaml/macro.yaml
+endif
+
 YAML_LOG_COMPILER_SCRIPT = yaml-log-compiler.sh
 TEST_EXTENSIONS = .yaml
 YAML_LOG_COMPILER = $(top_srcdir)/tests/$(YAML_LOG_COMPILER_SCRIPT)
@@ -259,6 +273,7 @@ LOG_COMPILE = $(WINE)
 
 EXTRA_DIST = $(dist_yaml_TESTS) $(dist_braille_specs_TESTS) $(YAML_LOG_COMPILER_SCRIPT)
 
+# ueb_test_data.pl fails (see also issues #764 and #268)
 XFAIL_TESTS =					\
 	ueb_test_data.pl
 

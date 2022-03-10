@@ -1,7 +1,7 @@
-liblouis 3.19.0 has been released
+liblouis 3.21.0 has been released
 
 The liblouis developer team is proud to announce the liblouis release
-3.19.0. The release is available for download at:
+3.21.0. The release is available for download at:
 
 https://github.com/liblouis/liblouis/releases
 
@@ -18,56 +18,68 @@ liblouisutdml [2]_ deals with formatting of braille.
 Noteworthy changes in this release
 ==================================
 
-For this release Bert Frees has been hard at work to clean up the code
-base. He fixed a few bugs one of which was causing memory corruption.
-Others have contributed corrections to braille tables or even provided
-new tables. For example there are now tables for Tshivenda and for
-Russian contracted braille.
+This release sees major updates for Hungarian and German. The Swiss
+Library for the Blind, Visually Impaired and Print Disabled has agreed
+to upstream their tables and Attila Hammer has adapted Hungarian to the
+latest standard. A bug in numeric mode was fixed which should it make
+more useful for languages other than UEB. Finally there are fixes for
+Norwegian and Danish.
 
 I'd like to thank everybody for helping to bring liblouis forward.
 
 For a detailed list of all the changes refer to the list of closed
 issues [3]_.
 
+New features
+------------
+
+-  New table for German 6-dot computer braille thanks to the Swiss
+   Library for the Blind, Visually Impaired and Print Disabled
+
 Bug fixes
 ---------
 
--  Fix a bug in the ``uplow`` opcode thanks to Bert Frees.
--  Fix a possible crash due to memory corruption thanks to Bert Frees.
+-  When numeric mode was enabled, i.e. when a table contains any of the
+   ``numericmodechars``, ``midnumericmodechars`` or
+   ``numericnocontchars`` opcodes, contraction was automatically
+   disabled. This is required for UEB but not necessarily so for other
+   braille systems (as mentioned in Issue 615).
+   This has now been changed so that contraction is only disabled if the
+   ``nocontractsign`` has been defined. Thanks to Christian Egli.
 
 Braille table improvements
 --------------------------
 
--  The Norwegian 6 dots braille tables now correctly handles signs like
-   section sign ('§' and '§§'), as well as numbersign ('#') before
-   numbers. In addition the letters a with acute, o with tilde, n with
-   long right leg and thorn are redefined. Phrases with capitals only
-   are know handled correctly. All thanks to Lars Bjørndal.
--  Fix a problem with 'ç' in Northern Kurdish thank to Imam Kahraman and
-   Christian Egli.
--  Add support for back translation in Russian literary braille thanks
-   to Andrey Yakuboy.
--  In Russian literary braille, if the letters 'Ё' and 'Й' consist of
-   two code points, they are displayed correctly.
--  Add new Russian contracted (grade 1) table thanks to Andrey Yakuboy
-   and Ekaterina Anisimova.
--  Update to Urdu, mostly to cater for spelling variations found in
-   source text. Thanks to Jake Kyle.
--  New contracted braille table for Tshivenda created by Christo de
-   Klerk at the request and under the auspices of the South African
-   Braille Authority.
--  Fix in Arabic computer braille table thanks to Ikrami Ahmad:
+-  Fixed emphasis, section sign and dash between numbers in Danish
+   tables thanks to Bue Vester-Andersen.
+-  Correct latin small letter sharp s in Norwegian thanks to Lars
+   Bjørndal and Dawn Renouf Bjørneby.
+-  Major improvements to German Braille thanks to the Swiss Library for
+   the Blind, Visually Impaired and Print Disabled
 
-   -  back-translate 256 to Latin full stop
+   -  Improvements to emphasis handling in German tables and greatly
+      extended test coverage.
+   -  All the improvements from the tables formerly known as bidi tables
+      were merged in the main tables and are now used by both tables.
+      The bidi tables have been renamed to &quot;detailed&quot;.
+      Essentially the detailed tables provide capitalized Braille which
+      helps with the back-translation.
+   -  Upstream all improvements from the ``sbs-braille-tables``.
 
--  Fix translation of URLs and file paths in Polish grade 1 table,
-   thanks to Łukasz Golonka.
+-  Improvements to the Hungarian tables thanks to Attila Hammer.
+
+   -  Improved back-translation, notably of words containing special
+      consonants like &quot;szsz&quot; or &quot;ssz&quot;.
+   -  Extended the Hungarian grade 1 &quot;braille input&quot;
+      (back-translation aided by special extra dot patterns).
+   -  Implemented latest update to the Hungarian braille standard (for
+      example the characters &quot;\&quot; and &quot;|&quot; were
+      changed).
 
 Other changes
 -------------
 
--  Fix the build script for Microsoft ``nmake`` thanks to Leonard de
-   Ruijter.
+-  Make ``autogen.sh`` work on MacOS, thanks to Ken Perry
 
 Deprecation notice
 ------------------
@@ -77,14 +89,8 @@ Deprecation notice
 Backwards incompatible changes
 ------------------------------
 
--  None
-
 Invisible changes
 -----------------
-
--  Major refactoring of ``compileTranslationTable.c`` thanks to Bert
-   Frees. Thanks to these changes a few bugs were found and fixed in the
-   code and a few tables.
 
 New, renamed or removed tables
 ------------------------------
@@ -92,14 +98,13 @@ New, renamed or removed tables
 New
 ~~~
 
--  ru-ru-g1.ctb
--  ve-za-g1.utb
--  ve-za-g2.ctb
+-  de-comp6.utb
 
 Renamed
 ~~~~~~~
 
-None
+-  de-g0-bidi.utb -&gt; de-g0-detailed.utb
+-  de-g1-bidi.ctb -&gt; de-g1-detailed.ctb
 
 Removed
 ~~~~~~~
@@ -109,8 +114,8 @@ None
 Next release
 ============
 
-The next release will be published on December 6 2021 so please keep up
-the excellent work and keep those improvements coming.
+The next release will be published on June 6 2022 so please keep up the
+excellent work and keep those improvements coming.
 
 Share and Enjoy!
 
@@ -126,4 +131,4 @@ Footnotes
    https://github.com/liblouis/liblouisutdml
 
 .. [3]
-   https://github.com/liblouis/liblouis/milestone/29?closed=1
+   https://github.com/liblouis/liblouis/milestone/31?closed=1
