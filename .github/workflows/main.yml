@@ -57,4 +57,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the nar
-      run: mvn nar:nar-prepare-package nar:nar-package jar:jar gpg:sign install:install
+      run: mvn nar:nar-prepare-package nar:nar-package jar:jar
