@@ -70,7 +70,7 @@ jobs:
 
   nar:
     name: Build a nar
-    needs: [build-macos, build-linux]
+    needs: [build-macos, build-linux, build-windows]
     runs-on: ubuntu-latest
 
     steps:
