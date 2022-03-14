@@ -7,20 +7,40 @@ on:
     branches: [ master ]
 
 jobs:
-  nar:
-    name: Build a nar
-
-    # we need to run on macos so that we also have binaries for mac in the nar
+  build-macos:
+    name: Build on macos
     runs-on: macos-11
 
     steps:
     - uses: actions/checkout@v2
+    - name: Build and test the package
+      run: mvn test
+    - name: Store the build arctifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: macos-build
+        path: target/nar
 
-    - name: Install docker
-      run: brew update && brew install docker
+  build-linux:
+    name: Build on Linux
+    runs-on: ubuntu-latest
 
-    - name: Build the docker image
-      run: docker build -t louis/builder .
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build and test the package
+      run: mvn test
+    - name: Store the build arctifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux-build
+        path: target/nar
 
-    - name: Run the docker image
-      run: docker run --rm -v $(pwd):/src louis/builder
+  nar:
+    name: Build a nar
+    needs: [build-macos, build-linux]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the nar
+      run: mvn nar:nar-prepare-package nar:nar-package jar:jar gpg:sign install:install
