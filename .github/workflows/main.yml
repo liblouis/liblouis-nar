@@ -28,26 +28,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: macos-build
-        path: target/nar
-
-  build-linux:
-    name: Build on Linux
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v2
-      with:
-        distribution: 'temurin'
-        java-version: '8'
-        cache: 'maven'
-    - name: Build and test the package
-      run: mvn test
-    - name: Store the build arctifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: linux-build
-        path: target/nar
+        path: target/nar/louis-*
 
   build-windows:
     name: Build for Windows
@@ -70,11 +51,11 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: windows-build
-        path: target/nar
+        path: target/nar/louis-*
 
   nar:
-    name: Build a nar
-    needs: [build-macos, build-linux, build-windows]
+    name: Build for linux and package the nar
+    needs: [build-macos, build-windows]
     runs-on: ubuntu-latest
 
     steps:
@@ -92,9 +73,5 @@ jobs:
       with:
         name: macos-build
         path: target/nar
-    - uses: actions/download-artifact@v3
-      with:
-        name: linux-build
-        path: target/nar
     - name: Build the nar
-      run: mvn nar:nar-prepare-package nar:nar-package jar:jar
+      run: mvn test nar:nar-prepare-package nar:nar-package jar:jar
