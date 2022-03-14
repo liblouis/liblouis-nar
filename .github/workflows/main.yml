@@ -60,6 +60,10 @@ jobs:
         distribution: 'temurin'
         java-version: '8'
         cache: 'maven'
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get texinfo libc6-dev-i386 mingw-w64
     - name: Build and test the package
       run: mvn test -Pcross-compile -Dhost.os=w64-mingw32 -Dos.arch=x86_64
     - name: Store the build arctifacts
