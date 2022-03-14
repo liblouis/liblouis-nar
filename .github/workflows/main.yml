@@ -75,3 +75,8 @@ jobs:
         path: target/nar
     - name: Build the nar
       run: mvn test nar:nar-prepare-package nar:nar-package jar:jar
+    - name: Store the build arctifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: nar
+        path: target/nar/louis-*
