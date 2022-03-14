@@ -84,5 +84,17 @@ jobs:
         distribution: 'temurin'
         java-version: '8'
         cache: 'maven'
+      - uses: actions/download-artifact@v3
+        with:
+          name: windows-build
+          path: target/nar
+      - uses: actions/download-artifact@v3
+        with:
+          name: macos-build
+          path: target/nar
+      - uses: actions/download-artifact@v3
+        with:
+          name: linux-build
+          path: target/nar
     - name: Build the nar
       run: mvn nar:nar-prepare-package nar:nar-package jar:jar
