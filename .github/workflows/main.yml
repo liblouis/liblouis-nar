@@ -49,6 +49,25 @@ jobs:
         name: linux-build
         path: target/nar
 
+  build-windows:
+    name: Build for Windows
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '8'
+        cache: 'maven'
+    - name: Build and test the package
+      run: mvn test -Pcross-compile -Dhost.os=w64-mingw32 -Dos.arch=x86_64
+    - name: Store the build arctifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-build
+        path: target/nar
+
   nar:
     name: Build a nar
     needs: [build-macos, build-linux]
