@@ -13,11 +13,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Build and test the package
     - name: Install build dependencies
       run: |
         brew update
         brew install automake
+    - name: Build and test the package
+      run: mvn test
     - name: Store the build arctifacts
       uses: actions/upload-artifact@v3
       with:
