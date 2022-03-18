@@ -343,10 +343,10 @@
 		  <name>GitHub Packages</name>
 		  <url>https://maven.pkg.github.com/liblouis/liblouis-nar</url>
 		</repository>
-		<snapshotRepository>
-			<id>sonatype-nexus-snapshots</id>
-			<name>oss.sonatype.org github Release Repository Snapshot Repository</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-		</snapshotRepository>
+		<!-- <snapshotRepository> -->
+		<!-- 	<id>sonatype-nexus-snapshots</id> -->
+		<!-- 	<name>oss.sonatype.org github Release Repository Snapshot Repository</name> -->
+		<!-- 	<url>https://oss.sonatype.org/content/repositories/snapshots/</url> -->
+		<!-- </snapshotRepository> -->
 	</distributionManagement>
 </project>
