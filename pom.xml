@@ -338,6 +338,11 @@
 			<name>oss.sonatype.org Staging Repository</name>
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
+		<repository>
+		  <id>github</id>
+		  <name>GitHub Packages</name>
+		  <url>https://maven.pkg.github.com/liblouis/liblouis-nar</url>
+		</repository>
 		<snapshotRepository>
 			<id>sonatype-nexus-snapshots</id>
 			<name>oss.sonatype.org github Release Repository Snapshot Repository</name>
