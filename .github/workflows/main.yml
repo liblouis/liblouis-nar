@@ -107,8 +107,12 @@ jobs:
         server-id: sonatype-nexus-snapshots # sonatype-nexus-staging
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
+        gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
     - name: Build the nar and publish
       run: mvn --batch-mode nar:nar-prepare-package nar:nar-package jar:jar deploy:deploy
       env:
         MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.SONATYPE_TOKEN }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
