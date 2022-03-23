@@ -68,6 +68,10 @@ jobs:
         cache: 'maven'
     - name: Build and test the package
       run: mvn test
+    - name: Install i386 build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libc6-dev-i386
     - name: Build and test the package for i386
       run: mvn test -Dos.arch=i386
     - name: Store the build arctifacts
