@@ -1,6 +1,8 @@
 name: Nar
 
 on:
+  workflow_dispatch:
+    
   # trigger this workflow on push of a release tag
   push:
     tags:
