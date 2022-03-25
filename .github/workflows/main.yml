@@ -111,7 +111,8 @@ jobs:
         gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
     - name: Build the nar and publish
-      run: mvn --batch-mode nar:nar-prepare-package nar:nar-package jar:jar gpg:sign deploy:deploy
+      run: mvn --batch-mode nar:nar-prepare-package nar:nar-package jar:jar gpg:sign org.sonatype.plugins:nexus-staging-maven-plugin:1.6.8:deploy -DnexusUrl=https://oss.sonatype.org/ -DserverId=sonatype-nexus-staging -DkeepStagingRepositoryOnCloseRuleFailure=true
+
       env:
         MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.SONATYPE_TOKEN }}
