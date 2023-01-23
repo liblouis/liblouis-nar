@@ -53,8 +53,21 @@
 # at the Swiss Lenana Mount Hotel on 25th August 2022.
 #
 
-include sw-ke-g1-5.ctb
+# FIXME: as a workaround for https://github.com/liblouis/liblouis/issues/1288
+# we have replaced the line "include sw-ke-g1-5.ctb" with the contents of sw-ke-g1-5.ctb
+# include sw-ke-g1-5.ctb
 
+##### begin of sw-ke-g1-5.ctb
+
+include sw-ke-g1-4.ctb
+midendword ote 46-15 46e
+midendword enye 56-15 56e
+midendword ond 46-145 46d
+midendword ong 56-1245 56g
+midendword lia 46-123 46l
+midendword lea 56-123 56l
+
+##### end of sw-ke-g1-5.ctb
 
 # Word Contractions
 # These contractions are created when the word is standing alone. The word can be
