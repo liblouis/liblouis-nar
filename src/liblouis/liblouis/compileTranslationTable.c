@@ -177,6 +177,7 @@ static const char *opcodeNames[CTO_None] = {
 	"noletsign",
 	"noletsignafter",
 	"numsign",
+	"nonumsign",
 	"numericmodechars",
 	"midendnumericmodechars",
 	"numericnocontchars",
@@ -1370,7 +1371,7 @@ parseChars(const FileInfo *file, CharsString *result, CharsString *token) {
 			if (ch >= first0Bit[numBytes]) break;
 		utf32 = ch & (0XFF - first0Bit[numBytes]);
 		for (k = 0; k < numBytes; k++) {
-			if (in >= MAXSTRING - 1) break;
+			if (in >= MAXSTRING - 1 || in >= token->length) break;
 			if (out >= MAXSTRING - 1) {
 				compileError(file, "Token too long");
 				result->length = lastOutSize;
@@ -1844,6 +1845,17 @@ verifyStringOrDots(const FileInfo *file, TranslationTableOpcode opcode, int isSt
 }
 
 static int
+appendInstructionChar(
+		const FileInfo *file, widechar *passInstructions, int *passIC, widechar ch) {
+	if (*passIC >= MAXSTRING) {
+		compileError(file, "multipass operand too long");
+		return 0;
+	}
+	passInstructions[(*passIC)++] = ch;
+	return 1;
+}
+
+static int
 compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int noback,
 		int nofor, TranslationTableHeader **table) {
 	static CharsString passRuleChars;
@@ -1863,6 +1875,7 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 	CharsString passLine;
 	int passLinepos = 0;
 	TranslationTableCharacterAttributes passAttributes;
+	int replacing = 0;
 	passHoldString.length = 0;
 	for (k = file->linepos; k < file->linelen; k++)
 		passHoldString.chars[passHoldString.length++] = file->line[k];
@@ -1883,32 +1896,34 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 	passLine.chars[endTest] = pass_endTest;
 	passLinepos = 0;
 	while (passLinepos <= endTest) {
-		if (passIC >= MAXSTRING) {
-			compileError(file, "Test part in multipass operand too long");
-			return 0;
-		}
 		switch ((passSubOp = passLine.chars[passLinepos])) {
 		case pass_lookback:
-			passInstructions[passIC++] = pass_lookback;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_lookback))
+				return 0;
 			passLinepos++;
 			passGetNumber(&passLine, &passLinepos, &passHoldNumber);
 			if (passHoldNumber == 0) passHoldNumber = 1;
-			passInstructions[passIC++] = passHoldNumber;
+			if (!appendInstructionChar(file, passInstructions, &passIC, passHoldNumber))
+				return 0;
 			break;
 		case pass_not:
-			passInstructions[passIC++] = pass_not;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_not))
+				return 0;
 			passLinepos++;
 			break;
 		case pass_first:
-			passInstructions[passIC++] = pass_first;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_first))
+				return 0;
 			passLinepos++;
 			break;
 		case pass_last:
-			passInstructions[passIC++] = pass_last;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_last))
+				return 0;
 			passLinepos++;
 			break;
 		case pass_search:
-			passInstructions[passIC++] = pass_search;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_search))
+				return 0;
 			passLinepos++;
 			break;
 		case pass_string:
@@ -1916,7 +1931,8 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 				return 0;
 			}
 			passLinepos++;
-			passInstructions[passIC++] = pass_string;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_string))
+				return 0;
 			passGetString(&passLine, &passLinepos, &passHoldString, file);
 			if (passHoldString.length == 0) {
 				compileError(file, "empty string in test part");
@@ -1928,7 +1944,8 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 				return 0;
 			}
 			passLinepos++;
-			passInstructions[passIC++] = pass_dots;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_dots))
+				return 0;
 			passGetDots(&passLine, &passLinepos, &passHoldString, file);
 			if (passHoldString.length == 0) {
 				compileError(file, "expected dot pattern after @ operand in test part");
@@ -1940,22 +1957,39 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 						file, "@ operand in test part of multipass operand too long");
 				return 0;
 			}
-			passInstructions[passIC++] = passHoldString.length;
+			if (!appendInstructionChar(
+						file, passInstructions, &passIC, passHoldString.length))
+				return 0;
 			for (kk = 0; kk < passHoldString.length; kk++) {
 				if (passIC >= MAXSTRING) {
 					compileError(
 							file, "@ operand in test part of multipass operand too long");
 					return 0;
 				}
-				passInstructions[passIC++] = passHoldString.chars[kk];
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, passHoldString.chars[kk]))
+					return 0;
 			}
 			break;
 		case pass_startReplace:
-			passInstructions[passIC++] = pass_startReplace;
+			if (replacing) {
+				compileError(file, "nested replacement statements");
+				return 0;
+			}
+			if (!appendInstructionChar(
+						file, passInstructions, &passIC, pass_startReplace))
+				return 0;
+			replacing = 1;
 			passLinepos++;
 			break;
 		case pass_endReplace:
-			passInstructions[passIC++] = pass_endReplace;
+			if (!replacing) {
+				compileError(file, "unexpected end of replacement");
+				return 0;
+			}
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_endReplace))
+				return 0;
+			replacing = 0;
 			passLinepos++;
 			break;
 		case pass_variable:
@@ -1964,26 +1998,37 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 				return 0;
 			switch (passLine.chars[passLinepos]) {
 			case pass_eq:
-				passInstructions[passIC++] = pass_eq;
+				if (!appendInstructionChar(file, passInstructions, &passIC, pass_eq))
+					return 0;
 				goto doComp;
 			case pass_lt:
 				if (passLine.chars[passLinepos + 1] == pass_eq) {
 					passLinepos++;
-					passInstructions[passIC++] = pass_lteq;
-				} else
-					passInstructions[passIC++] = pass_lt;
+					if (!appendInstructionChar(
+								file, passInstructions, &passIC, pass_lteq))
+						return 0;
+				} else if (!appendInstructionChar(
+								   file, passInstructions, &passIC, pass_lt))
+					return 0;
 				goto doComp;
 			case pass_gt:
 				if (passLine.chars[passLinepos + 1] == pass_eq) {
 					passLinepos++;
-					passInstructions[passIC++] = pass_gteq;
-				} else
-					passInstructions[passIC++] = pass_gt;
+					if (!appendInstructionChar(
+								file, passInstructions, &passIC, pass_gteq))
+						return 0;
+				} else if (!appendInstructionChar(
+								   file, passInstructions, &passIC, pass_gt))
+					return 0;
 			doComp:
-				passInstructions[passIC++] = passHoldNumber;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, passHoldNumber))
+					return 0;
 				passLinepos++;
 				passGetNumber(&passLine, &passLinepos, &passHoldNumber);
-				passInstructions[passIC++] = passHoldNumber;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, passHoldNumber))
+					return 0;
 				break;
 			default:
 				compileError(file, "incorrect comparison operator");
@@ -1995,27 +2040,40 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 			if (!passGetAttributes(&passLine, &passLinepos, &passAttributes, file))
 				return 0;
 		insertAttributes:
-			passInstructions[passIC++] = pass_attributes;
-			passInstructions[passIC++] = (passAttributes >> 48) & 0xffff;
-			passInstructions[passIC++] = (passAttributes >> 32) & 0xffff;
-			passInstructions[passIC++] = (passAttributes >> 16) & 0xffff;
-			passInstructions[passIC++] = passAttributes & 0xffff;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_attributes))
+				return 0;
+			if (!appendInstructionChar(
+						file, passInstructions, &passIC, (passAttributes >> 48) & 0xffff))
+				return 0;
+			if (!appendInstructionChar(
+						file, passInstructions, &passIC, (passAttributes >> 32) & 0xffff))
+				return 0;
+			if (!appendInstructionChar(
+						file, passInstructions, &passIC, (passAttributes >> 16) & 0xffff))
+				return 0;
+			if (!appendInstructionChar(
+						file, passInstructions, &passIC, passAttributes & 0xffff))
+				return 0;
 		getRange:
 			if (passLine.chars[passLinepos] == pass_until) {
 				passLinepos++;
-				passInstructions[passIC++] = 1;
-				passInstructions[passIC++] = 0xffff;
+				if (!appendInstructionChar(file, passInstructions, &passIC, 1)) return 0;
+				if (!appendInstructionChar(file, passInstructions, &passIC, 0xffff))
+					return 0;
 				break;
 			}
 			passGetNumber(&passLine, &passLinepos, &passHoldNumber);
 			if (passHoldNumber == 0) {
-				passHoldNumber = passInstructions[passIC++] = 1;
-				passInstructions[passIC++] = 1; /* This is not an error */
+				if (!appendInstructionChar(file, passInstructions, &passIC, 1)) return 0;
+				if (!appendInstructionChar(file, passInstructions, &passIC, 1)) return 0;
 				break;
 			}
-			passInstructions[passIC++] = passHoldNumber;
+			if (!appendInstructionChar(file, passInstructions, &passIC, passHoldNumber))
+				return 0;
 			if (passLine.chars[passLinepos] != pass_hyphen) {
-				passInstructions[passIC++] = passHoldNumber;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, passHoldNumber))
+					return 0;
 				break;
 			}
 			passLinepos++;
@@ -2024,7 +2082,8 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 				compileError(file, "invalid range");
 				return 0;
 			}
-			passInstructions[passIC++] = passHoldNumber;
+			if (!appendInstructionChar(file, passInstructions, &passIC, passHoldNumber))
+				return 0;
 			break;
 		case pass_groupstart:
 		case pass_groupend: {
@@ -2034,9 +2093,14 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 			if (ruleOffset)
 				rule = (TranslationTableRule *)&(*table)->ruleArea[ruleOffset];
 			if (rule && rule->opcode == CTO_Grouping) {
-				passInstructions[passIC++] = passSubOp;
-				passInstructions[passIC++] = ruleOffset >> 16;
-				passInstructions[passIC++] = ruleOffset & 0xffff;
+				if (!appendInstructionChar(file, passInstructions, &passIC, passSubOp))
+					return 0;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, ruleOffset >> 16))
+					return 0;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, ruleOffset & 0xffff))
+					return 0;
 				break;
 			} else {
 				compileError(file, "%s is not a grouping name",
@@ -2059,9 +2123,14 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 			if (rule &&
 					(rule->opcode == CTO_SwapCc || rule->opcode == CTO_SwapCd ||
 							rule->opcode == CTO_SwapDd)) {
-				passInstructions[passIC++] = pass_swap;
-				passInstructions[passIC++] = ruleOffset >> 16;
-				passInstructions[passIC++] = ruleOffset & 0xffff;
+				if (!appendInstructionChar(file, passInstructions, &passIC, pass_swap))
+					return 0;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, ruleOffset >> 16))
+					return 0;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, ruleOffset & 0xffff))
+					return 0;
 				goto getRange;
 			}
 			compileError(file, "%s is neither a class name nor a swap name.",
@@ -2069,7 +2138,12 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 			return 0;
 		}
 		case pass_endTest:
-			passInstructions[passIC++] = pass_endTest;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_endTest))
+				return 0;
+			if (replacing) {
+				compileError(file, "expected end of replacement");
+				return 0;
+			}
 			passLinepos++;
 			break;
 		default:
@@ -2094,7 +2168,8 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 				return 0;
 			}
 			passLinepos++;
-			passInstructions[passIC++] = pass_string;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_string))
+				return 0;
 			passGetString(&passLine, &passLinepos, &passHoldString, file);
 			goto actionDoCharsDots;
 		case pass_dots:
@@ -2103,7 +2178,8 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 			}
 			passLinepos++;
 			passGetDots(&passLine, &passLinepos, &passHoldString, file);
-			passInstructions[passIC++] = pass_dots;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_dots))
+				return 0;
 			if (passHoldString.length == 0) {
 				compileError(file, "expected dot pattern after @ operand in action part");
 				return 0;
@@ -2114,14 +2190,18 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 						file, "@ operand in action part of multipass operand too long");
 				return 0;
 			}
-			passInstructions[passIC++] = passHoldString.length;
+			if (!appendInstructionChar(
+						file, passInstructions, &passIC, passHoldString.length))
+				return 0;
 			for (kk = 0; kk < passHoldString.length; kk++) {
 				if (passIC >= MAXSTRING) {
 					compileError(file,
 							"@ operand in action part of multipass operand too long");
 					return 0;
 				}
-				passInstructions[passIC++] = passHoldString.chars[kk];
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, passHoldString.chars[kk]))
+					return 0;
 			}
 			break;
 		case pass_variable:
@@ -2130,16 +2210,25 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 				return 0;
 			switch (passLine.chars[passLinepos]) {
 			case pass_eq:
-				passInstructions[passIC++] = pass_eq;
-				passInstructions[passIC++] = passHoldNumber;
+				if (!appendInstructionChar(file, passInstructions, &passIC, pass_eq))
+					return 0;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, passHoldNumber))
+					return 0;
 				passLinepos++;
 				passGetNumber(&passLine, &passLinepos, &passHoldNumber);
-				passInstructions[passIC++] = passHoldNumber;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, passHoldNumber))
+					return 0;
 				break;
 			case pass_plus:
 			case pass_hyphen:
-				passInstructions[passIC++] = passLine.chars[passLinepos++];
-				passInstructions[passIC++] = passHoldNumber;
+				if (!appendInstructionChar(file, passInstructions, &passIC,
+							passLine.chars[passLinepos++]))
+					return 0;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, passHoldNumber))
+					return 0;
 				break;
 			default:
 				compileError(file, "incorrect variable operator in action part");
@@ -2147,11 +2236,13 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 			}
 			break;
 		case pass_copy:
-			passInstructions[passIC++] = pass_copy;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_copy))
+				return 0;
 			passLinepos++;
 			break;
 		case pass_omit:
-			passInstructions[passIC++] = pass_omit;
+			if (!appendInstructionChar(file, passInstructions, &passIC, pass_omit))
+				return 0;
 			passLinepos++;
 			break;
 		case pass_groupreplace:
@@ -2163,9 +2254,14 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 			if (ruleOffset)
 				rule = (TranslationTableRule *)&(*table)->ruleArea[ruleOffset];
 			if (rule && rule->opcode == CTO_Grouping) {
-				passInstructions[passIC++] = passSubOp;
-				passInstructions[passIC++] = ruleOffset >> 16;
-				passInstructions[passIC++] = ruleOffset & 0xffff;
+				if (!appendInstructionChar(file, passInstructions, &passIC, passSubOp))
+					return 0;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, ruleOffset >> 16))
+					return 0;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, ruleOffset & 0xffff))
+					return 0;
 				break;
 			}
 			compileError(file, "%s is not a grouping name",
@@ -2181,9 +2277,14 @@ compilePassOpcode(const FileInfo *file, TranslationTableOpcode opcode, int nobac
 			if (rule &&
 					(rule->opcode == CTO_SwapCc || rule->opcode == CTO_SwapCd ||
 							rule->opcode == CTO_SwapDd)) {
-				passInstructions[passIC++] = pass_swap;
-				passInstructions[passIC++] = ruleOffset >> 16;
-				passInstructions[passIC++] = ruleOffset & 0xffff;
+				if (!appendInstructionChar(file, passInstructions, &passIC, pass_swap))
+					return 0;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, ruleOffset >> 16))
+					return 0;
+				if (!appendInstructionChar(
+							file, passInstructions, &passIC, ruleOffset & 0xffff))
+					return 0;
 				break;
 			}
 			compileError(file, "%s is not a swap name.",
@@ -3167,8 +3268,11 @@ doOpcode:
 				TranslationTableOffset ruleOffset =
 						(*table)->emphRules[MAX_EMPH_CLASSES + i][begPhraseOffset];
 				if (!compileBrailleIndicator(file, "first word capital sign",
-							CTO_BegCapsPhraseRule + (8 * i), &ruleOffset, noback, nofor,
-							table))
+							// when mode is not caps (i != 0), provide enough information
+							// for back-translator to be able to recognize and ignore the
+							// indicator (but it won't be able to determine the mode)
+							i == 0 ? CTO_BegCapsPhrase : CTO_BegModePhrase, &ruleOffset,
+							noback, nofor, table))
 					return 0;
 				(*table)->emphRules[MAX_EMPH_CLASSES + i][begPhraseOffset] = ruleOffset;
 				return 1;
@@ -3187,8 +3291,8 @@ doOpcode:
 					ruleOffset = (*table)->emphRules[MAX_EMPH_CLASSES + i]
 													[endPhraseBeforeOffset];
 					if (!compileBrailleIndicator(file, "capital sign before last word",
-								CTO_EndCapsPhraseBeforeRule + (8 * i), &ruleOffset,
-								noback, nofor, table))
+								i == 0 ? CTO_EndCapsPhraseBefore : CTO_EndModePhrase,
+								&ruleOffset, noback, nofor, table))
 						return 0;
 					(*table)->emphRules[MAX_EMPH_CLASSES + i][endPhraseBeforeOffset] =
 							ruleOffset;
@@ -3205,8 +3309,8 @@ doOpcode:
 					ruleOffset = (*table)->emphRules[MAX_EMPH_CLASSES + i]
 													[endPhraseAfterOffset];
 					if (!compileBrailleIndicator(file, "capital sign after last word",
-								CTO_EndCapsPhraseAfterRule + (8 * i), &ruleOffset, noback,
-								nofor, table))
+								i == 0 ? CTO_EndCapsPhraseAfter : CTO_EndModePhrase,
+								&ruleOffset, noback, nofor, table))
 						return 0;
 					(*table)->emphRules[MAX_EMPH_CLASSES + i][endPhraseAfterOffset] =
 							ruleOffset;
@@ -3223,7 +3327,8 @@ doOpcode:
 				TranslationTableOffset ruleOffset =
 						(*table)->emphRules[MAX_EMPH_CLASSES + i][begOffset];
 				if (!compileBrailleIndicator(file, "first letter capital sign",
-							CTO_BegCapsRule + (8 * i), &ruleOffset, noback, nofor, table))
+							i == 0 ? CTO_BegCaps : CTO_BegMode, &ruleOffset, noback,
+							nofor, table))
 					return 0;
 				(*table)->emphRules[MAX_EMPH_CLASSES + i][begOffset] = ruleOffset;
 				return 1;
@@ -3234,7 +3339,8 @@ doOpcode:
 				TranslationTableOffset ruleOffset =
 						(*table)->emphRules[MAX_EMPH_CLASSES + i][endOffset];
 				if (!compileBrailleIndicator(file, "last letter capital sign",
-							CTO_EndCapsRule + (8 * i), &ruleOffset, noback, nofor, table))
+							i == 0 ? CTO_EndCaps : CTO_EndMode, &ruleOffset, noback,
+							nofor, table))
 					return 0;
 				(*table)->emphRules[MAX_EMPH_CLASSES + i][endOffset] = ruleOffset;
 				return 1;
@@ -3245,8 +3351,8 @@ doOpcode:
 				TranslationTableOffset ruleOffset =
 						(*table)->emphRules[MAX_EMPH_CLASSES + i][letterOffset];
 				if (!compileBrailleIndicator(file, "single letter capital sign",
-							CTO_CapsLetterRule + (8 * i), &ruleOffset, noback, nofor,
-							table))
+							i == 0 ? CTO_CapsLetter : CTO_ModeLetter, &ruleOffset, noback,
+							nofor, table))
 					return 0;
 				(*table)->emphRules[MAX_EMPH_CLASSES + i][letterOffset] = ruleOffset;
 				return 1;
@@ -3257,8 +3363,8 @@ doOpcode:
 				TranslationTableOffset ruleOffset =
 						(*table)->emphRules[MAX_EMPH_CLASSES + i][begWordOffset];
 				if (!compileBrailleIndicator(file, "capital word",
-							CTO_BegCapsWordRule + (8 * i), &ruleOffset, noback, nofor,
-							table))
+							i == 0 ? CTO_BegCapsWord : CTO_BegModeWord, &ruleOffset,
+							noback, nofor, table))
 					return 0;
 				(*table)->emphRules[MAX_EMPH_CLASSES + i][begWordOffset] = ruleOffset;
 				return 1;
@@ -3269,8 +3375,8 @@ doOpcode:
 				TranslationTableOffset ruleOffset =
 						(*table)->emphRules[MAX_EMPH_CLASSES + i][endWordOffset];
 				if (!compileBrailleIndicator(file, "capital word stop",
-							CTO_EndCapsWordRule + (8 * i), &ruleOffset, noback, nofor,
-							table))
+							i == 0 ? CTO_EndCapsWord : CTO_EndModeWord, &ruleOffset,
+							noback, nofor, table))
 					return 0;
 				(*table)->emphRules[MAX_EMPH_CLASSES + i][endWordOffset] = ruleOffset;
 				return 1;
@@ -3408,9 +3514,11 @@ doOpcode:
 				// not passing pointer because compileBrailleIndicator may reallocate
 				// table
 				TranslationTableOffset ruleOffset = (*table)->emphRules[i][letterOffset];
-				if (!compileBrailleIndicator(file, "single letter",
-							CTO_Emph1LetterRule + letterOffset + (8 * i), &ruleOffset,
-							noback, nofor, table))
+				// provide enough information for back-translator to be able to recognize
+				// and ignore the indicator (but it won't be able to determine the
+				// emphasis class)
+				if (!compileBrailleIndicator(file, "single letter", CTO_EmphLetter,
+							&ruleOffset, noback, nofor, table))
 					break;
 				(*table)->emphRules[i][letterOffset] = ruleOffset;
 				ok = 1;
@@ -3420,8 +3528,7 @@ doOpcode:
 				// not passing pointer because compileBrailleIndicator may reallocate
 				// table
 				TranslationTableOffset ruleOffset = (*table)->emphRules[i][begWordOffset];
-				if (!compileBrailleIndicator(file, "word",
-							CTO_Emph1LetterRule + begWordOffset + (8 * i), &ruleOffset,
+				if (!compileBrailleIndicator(file, "word", CTO_BegEmphWord, &ruleOffset,
 							noback, nofor, table))
 					break;
 				(*table)->emphRules[i][begWordOffset] = ruleOffset;
@@ -3432,9 +3539,8 @@ doOpcode:
 				// not passing pointer because compileBrailleIndicator may reallocate
 				// table
 				TranslationTableOffset ruleOffset = (*table)->emphRules[i][endWordOffset];
-				if (!compileBrailleIndicator(file, "word stop",
-							CTO_Emph1LetterRule + endWordOffset + (8 * i), &ruleOffset,
-							noback, nofor, table))
+				if (!compileBrailleIndicator(file, "word stop", CTO_EndEmphWord,
+							&ruleOffset, noback, nofor, table))
 					break;
 				(*table)->emphRules[i][endWordOffset] = ruleOffset;
 				ok = 1;
@@ -3454,9 +3560,8 @@ doOpcode:
 				// not passing pointer because compileBrailleIndicator may reallocate
 				// table
 				TranslationTableOffset ruleOffset = (*table)->emphRules[i][begOffset];
-				if (!compileBrailleIndicator(file, "first letter",
-							CTO_Emph1LetterRule + begOffset + (8 * i), &ruleOffset,
-							noback, nofor, table))
+				if (!compileBrailleIndicator(file, "first letter", CTO_BegEmph,
+							&ruleOffset, noback, nofor, table))
 					break;
 				(*table)->emphRules[i][begOffset] = ruleOffset;
 				ok = 1;
@@ -3475,9 +3580,8 @@ doOpcode:
 				// not passing pointer because compileBrailleIndicator may reallocate
 				// table
 				TranslationTableOffset ruleOffset = (*table)->emphRules[i][endOffset];
-				if (!compileBrailleIndicator(file, "last letter",
-							CTO_Emph1LetterRule + endOffset + (8 * i), &ruleOffset,
-							noback, nofor, table))
+				if (!compileBrailleIndicator(file, "last letter", CTO_EndEmph,
+							&ruleOffset, noback, nofor, table))
 					break;
 				(*table)->emphRules[i][endOffset] = ruleOffset;
 				ok = 1;
@@ -3488,9 +3592,8 @@ doOpcode:
 				// table
 				TranslationTableOffset ruleOffset =
 						(*table)->emphRules[i][begPhraseOffset];
-				if (!compileBrailleIndicator(file, "first word",
-							CTO_Emph1LetterRule + begPhraseOffset + (8 * i), &ruleOffset,
-							noback, nofor, table))
+				if (!compileBrailleIndicator(file, "first word", CTO_BegEmphPhrase,
+							&ruleOffset, noback, nofor, table))
 					break;
 				(*table)->emphRules[i][begPhraseOffset] = ruleOffset;
 				ok = 1;
@@ -3508,8 +3611,7 @@ doOpcode:
 					TranslationTableOffset ruleOffset =
 							(*table)->emphRules[i][endPhraseBeforeOffset];
 					if (!compileBrailleIndicator(file, "last word before",
-								CTO_Emph1LetterRule + endPhraseBeforeOffset + (8 * i),
-								&ruleOffset, noback, nofor, table))
+								CTO_EndEmphPhrase, &ruleOffset, noback, nofor, table))
 						break;
 					(*table)->emphRules[i][endPhraseBeforeOffset] = ruleOffset;
 					ok = 1;
@@ -3525,8 +3627,7 @@ doOpcode:
 					TranslationTableOffset ruleOffset =
 							(*table)->emphRules[i][endPhraseAfterOffset];
 					if (!compileBrailleIndicator(file, "last word after",
-								CTO_Emph1LetterRule + endPhraseAfterOffset + (8 * i),
-								&ruleOffset, noback, nofor, table))
+								CTO_EndEmphPhrase, &ruleOffset, noback, nofor, table))
 						break;
 					(*table)->emphRules[i][endPhraseAfterOffset] = ruleOffset;
 					ok = 1;
@@ -3592,7 +3693,7 @@ doOpcode:
 		case CTO_LetterSign: {
 			// not passing pointer because compileBrailleIndicator may reallocate table
 			TranslationTableOffset ruleOffset = (*table)->letterSign;
-			if (!compileBrailleIndicator(file, "letter sign", CTO_LetterRule, &ruleOffset,
+			if (!compileBrailleIndicator(file, "letter sign", CTO_LetterSign, &ruleOffset,
 						noback, nofor, table))
 				return 0;
 			(*table)->letterSign = ruleOffset;
@@ -3630,10 +3731,19 @@ doOpcode:
 		case CTO_NumberSign: {
 			// not passing pointer because compileBrailleIndicator may reallocate table
 			TranslationTableOffset ruleOffset = (*table)->numberSign;
-			if (!compileBrailleIndicator(file, "number sign", CTO_NumberRule, &ruleOffset,
+			if (!compileBrailleIndicator(file, "number sign", CTO_NumberSign, &ruleOffset,
 						noback, nofor, table))
 				return 0;
 			(*table)->numberSign = ruleOffset;
+			return 1;
+		}
+		case CTO_NoNumberSign: {
+			// not passing pointer because compileBrailleIndicator may reallocate table
+			TranslationTableOffset ruleOffset = (*table)->noNumberSign;
+			if (!compileBrailleIndicator(file, "no number sign", CTO_NoNumberSign,
+						&ruleOffset, noback, nofor, table))
+				return 0;
+			(*table)->noNumberSign = ruleOffset;
 			return 1;
 		}
 
@@ -3680,7 +3790,7 @@ doOpcode:
 		case CTO_NoContractSign: {
 			// not passing pointer because compileBrailleIndicator may reallocate table
 			TranslationTableOffset ruleOffset = (*table)->noContractSign;
-			if (!compileBrailleIndicator(file, "no contractions sign", CTO_NoContractRule,
+			if (!compileBrailleIndicator(file, "no contractions sign", CTO_NoContractSign,
 						&ruleOffset, noback, nofor, table))
 				return 0;
 			(*table)->noContractSign = ruleOffset;
@@ -3736,12 +3846,14 @@ doOpcode:
 
 		case CTO_SeqAfterExpression:
 			if (!getRuleCharsText(file, &ruleChars)) return 0;
-			for ((*table)->seqAfterExpressionLength = 0;
-					(*table)->seqAfterExpressionLength < ruleChars.length;
-					(*table)->seqAfterExpressionLength++)
-				(*table)->seqAfterExpression[(*table)->seqAfterExpressionLength] =
-						ruleChars.chars[(*table)->seqAfterExpressionLength];
-			(*table)->seqAfterExpression[(*table)->seqAfterExpressionLength] = 0;
+			if ((ruleChars.length + 1) > SEQPATTERNSIZE) {
+				compileError(file, "More than %d characters", SEQPATTERNSIZE);
+				return 0;
+			}
+			for (int k = 0; k < ruleChars.length; k++)
+				(*table)->seqAfterExpression[k] = ruleChars.chars[k];
+			(*table)->seqAfterExpression[ruleChars.length] = 0;
+			(*table)->seqAfterExpressionLength = ruleChars.length;
 			return 1;
 
 		case CTO_CapsModeChars:
@@ -3760,7 +3872,7 @@ doOpcode:
 		case CTO_BegComp: {
 			// not passing pointer because compileBrailleIndicator may reallocate table
 			TranslationTableOffset ruleOffset = (*table)->begComp;
-			if (!compileBrailleIndicator(file, "begin computer braille", CTO_BegCompRule,
+			if (!compileBrailleIndicator(file, "begin computer braille", CTO_BegComp,
 						&ruleOffset, noback, nofor, table))
 				return 0;
 			(*table)->begComp = ruleOffset;
@@ -3769,7 +3881,7 @@ doOpcode:
 		case CTO_EndComp: {
 			// not passing pointer because compileBrailleIndicator may reallocate table
 			TranslationTableOffset ruleOffset = (*table)->endComp;
-			if (!compileBrailleIndicator(file, "end computer braslle", CTO_EndCompRule,
+			if (!compileBrailleIndicator(file, "end computer braslle", CTO_EndComp,
 						&ruleOffset, noback, nofor, table))
 				return 0;
 			(*table)->endComp = ruleOffset;
@@ -3901,8 +4013,8 @@ doOpcode:
 			TranslationTableOffset ruleOffset;
 			ruleChars.length = 1;
 			ruleChars.chars[0] = 'a';
-			if (!addRule(file, CTO_CapsNoContRule, &ruleChars, NULL, after, before,
-						&ruleOffset, NULL, noback, nofor, table))
+			if (!addRule(file, opcode, &ruleChars, NULL, after, before, &ruleOffset, NULL,
+						noback, nofor, table))
 				return 0;
 			(*table)->capsNoCont = ruleOffset;
 			return 1;
@@ -4670,6 +4782,16 @@ compileFile(const char *fileName, TranslationTableHeader **table,
 	return !errorCount;
 }
 
+static void
+freeTranslationTable(TranslationTableHeader *t) {
+	for (int i = 0; i < MAX_EMPH_CLASSES && t->emphClassNames[i]; i++)
+		free(t->emphClassNames[i]);
+	for (int i = 0; t->sourceFiles[i]; i++) free(t->sourceFiles[i]);
+	if (t->characterClasses) deallocateCharacterClasses(t);
+	if (t->ruleNames) deallocateRuleNames(t);
+	free(t);
+}
+
 /**
  * Free a char** array
  */
@@ -4798,7 +4920,7 @@ cleanup:
 	} else {
 		_lou_logMessage(LOU_LOG_ERROR, "%d errors found.", errorCount);
 		if (translationTable) {
-			if (*translationTable) free(*translationTable);
+			if (*translationTable) freeTranslationTable(*translationTable);
 			*translationTable = NULL;
 		}
 		if (displayTable) {
@@ -5106,13 +5228,7 @@ lou_free(void) {
 	if (translationTableChain != NULL) {
 		currentEntry = translationTableChain;
 		while (currentEntry) {
-			TranslationTableHeader *t = (TranslationTableHeader *)currentEntry->table;
-			for (int i = 0; i < MAX_EMPH_CLASSES && t->emphClassNames[i]; i++)
-				free(t->emphClassNames[i]);
-			for (int i = 0; t->sourceFiles[i]; i++) free(t->sourceFiles[i]);
-			if (t->characterClasses) deallocateCharacterClasses(t);
-			if (t->ruleNames) deallocateRuleNames(t);
-			free(t);
+			freeTranslationTable(currentEntry->table);
 			previousEntry = currentEntry;
 			currentEntry = currentEntry->next;
 			free(previousEntry);

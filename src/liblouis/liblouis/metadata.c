@@ -531,15 +531,15 @@ analyzeTable(const char *table, int activeOnly) {
 							if (strcasecmp(k, "locale") == 0) {
 								FeatureWithLineNumber *f1 =
 										memcpy(malloc(sizeof(FeatureWithLineNumber)),
-												&(FeatureWithLineNumber){
+												(&(FeatureWithLineNumber){
 														feature_new("language", v),
-														info.lineNumber },
+														info.lineNumber }),
 												sizeof(FeatureWithLineNumber));
 								FeatureWithLineNumber *f2 =
 										memcpy(malloc(sizeof(FeatureWithLineNumber)),
-												&(FeatureWithLineNumber){
+												(&(FeatureWithLineNumber){
 														feature_new("region", v),
-														info.lineNumber },
+														info.lineNumber }),
 												sizeof(FeatureWithLineNumber));
 								_lou_logMessage(LOU_LOG_DEBUG,
 										"Table has feature '%s:%s'", f1->feature.key,
@@ -557,8 +557,8 @@ analyzeTable(const char *table, int activeOnly) {
 							} else {
 								FeatureWithLineNumber *f = memcpy(
 										malloc(sizeof(FeatureWithLineNumber)),
-										&(FeatureWithLineNumber){
-												feature_new(k, v), info.lineNumber },
+										(&(FeatureWithLineNumber){
+												feature_new(k, v), info.lineNumber }),
 										sizeof(FeatureWithLineNumber));
 								_lou_logMessage(LOU_LOG_DEBUG,
 										"Table has feature '%s:%s'", f->feature.key,
@@ -583,8 +583,8 @@ analyzeTable(const char *table, int activeOnly) {
 		fclose(info.in);
 		if (!region && language) {
 			region = memcpy(malloc(sizeof(FeatureWithLineNumber)),
-					&(FeatureWithLineNumber){
-							feature_new("region", language->feature.val), -1 },
+					(&(FeatureWithLineNumber){
+							feature_new("region", language->feature.val), -1 }),
 					sizeof(FeatureWithLineNumber));
 			_lou_logMessage(LOU_LOG_DEBUG, "Table has feature '%s:%s'",
 					region->feature.key, region->feature.val);
@@ -773,8 +773,8 @@ lou_findTables(const char *query) {
 		_lou_logMessage(LOU_LOG_INFO, "%d matches found", list_size(matches));
 		int i = 0;
 		tablesArray = malloc((1 + list_size(matches)) * sizeof(void *));
-		for (; matches; matches = matches->tail)
-			tablesArray[i++] = ((TableMatch *)matches->head)->name;
+		for (List *m = matches; m; m = m->tail)
+			tablesArray[i++] = ((TableMatch *)m->head)->name;
 		tablesArray[i] = NULL;
 		list_free(matches);
 		return tablesArray;

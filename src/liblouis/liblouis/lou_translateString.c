@@ -390,6 +390,7 @@ swapTest(int swapIC, int *pos, const TranslationTableHeader *table, const InStri
 	swapRule = (TranslationTableRule *)&table->ruleArea[swapRuleOffset];
 	while (p - *pos < passInstructions[swapIC + 3]) {
 		int test;
+		if (p >= input->length) return 0;
 		if (swapRule->opcode == CTO_SwapDd) {
 			for (test = 1; test < swapRule->charslen; test += 2) {
 				if (input->chars[p] == swapRule->charsdots[test]) break;
@@ -408,6 +409,10 @@ swapTest(int swapIC, int *pos, const TranslationTableHeader *table, const InStri
 	}
 	while (p - *pos < passInstructions[swapIC + 4]) {
 		int test;
+		if (p >= input->length) {
+			*pos = p;
+			return 1;
+		}
 		if (swapRule->opcode == CTO_SwapDd) {
 			for (test = 1; test < swapRule->charslen; test += 2) {
 				if (input->chars[p] == swapRule->charsdots[test]) break;
@@ -591,7 +596,7 @@ doPassSearch(const TranslationTableHeader *table, const InString *input,
 		TranslationTableRule *groupingRule, widechar groupingOp) {
 	int level = 0;
 	int k, kk;
-	int not = 0;  // whether next operand should be reversed
+	int notOperator = 0;  // whether next operand should be reversed
 	TranslationTableOffset ruleOffset;
 	TranslationTableRule *rule;
 	TranslationTableCharacterAttributes attributes;
@@ -611,7 +616,7 @@ doPassSearch(const TranslationTableHeader *table, const InString *input,
 				*searchIC += 2;
 				break;
 			case pass_not:
-				not = !not;
+				notOperator = !notOperator;
 				(*searchIC)++;
 				continue;
 			case pass_string:
@@ -651,7 +656,7 @@ doPassSearch(const TranslationTableHeader *table, const InString *input,
 														  table))
 										  ->attributes &
 								attributes;
-						if (not) itsTrue = !itsTrue;
+						if (notOperator) itsTrue = !itsTrue;
 					}
 					if (!itsTrue) break;
 				}
@@ -666,13 +671,13 @@ doPassSearch(const TranslationTableHeader *table, const InString *input,
 											: getChar(input->chars[*searchPos], table))
 											->attributes &
 									attributes)) {
-							if (!not) break;
-						} else if (not)
+							if (!notOperator) break;
+						} else if (notOperator)
 							break;
 						(*searchPos)++;
 					}
 				}
-				not = 0;
+				notOperator = 0;
 				*searchIC += 7;
 				break;
 			case pass_groupstart:
@@ -716,8 +721,8 @@ doPassSearch(const TranslationTableHeader *table, const InString *input,
 					break;
 				break;
 			}
-			if ((!not&&!itsTrue) || (not&&itsTrue)) break;
-			not = 0;
+			if ((!notOperator && !itsTrue) || (notOperator && itsTrue)) break;
+			notOperator = 0;
 		}
 		pos++;
 	}
@@ -731,7 +736,7 @@ passDoTest(const TranslationTableHeader *table, int pos, const InString *input,
 		TranslationTableRule **groupingRule, widechar *groupingOp) {
 	int searchIC, searchPos;
 	int k;
-	int not = 0;  // whether next operand should be reversed
+	int notOperator = 0;  // whether next operand should be reversed
 	TranslationTableOffset ruleOffset = 0;
 	TranslationTableRule *rule = NULL;
 	TranslationTableCharacterAttributes attributes = 0;
@@ -767,7 +772,7 @@ passDoTest(const TranslationTableHeader *table, int pos, const InString *input,
 			*passIC += 2;
 			break;
 		case pass_not:
-			not = !not;
+			notOperator = !notOperator;
 			(*passIC)++;
 			continue;
 		case pass_string:
@@ -805,11 +810,11 @@ passDoTest(const TranslationTableHeader *table, int pos, const InString *input,
 									 : getChar(input->chars[pos], table))
 									->attributes &
 							attributes)) {
-					if (!not) {
+					if (!notOperator) {
 						itsTrue = 0;
 						break;
 					}
-				} else if (not) {
+				} else if (notOperator) {
 					itsTrue = 0;
 					break;
 				}
@@ -827,13 +832,13 @@ passDoTest(const TranslationTableHeader *table, int pos, const InString *input,
 										 : getChar(input->chars[pos], table))
 										->attributes &
 								attributes)) {
-						if (!not) break;
-					} else if (not)
+						if (!notOperator) break;
+					} else if (notOperator)
 						break;
 					pos++;
 				}
 			}
-			not = 0;
+			notOperator = 0;
 			*passIC += 7;
 			break;
 		case pass_groupstart:
@@ -865,7 +870,7 @@ passDoTest(const TranslationTableHeader *table, int pos, const InString *input,
 			itsTrue = doPassSearch(table, input, transRule, *passCharDots, pos,
 					*passInstructions, *passIC, &searchIC, &searchPos, *groupingRule,
 					*groupingOp);
-			if ((!not&&!itsTrue) || (not&&itsTrue)) return 0;
+			if ((!notOperator && !itsTrue) || (notOperator && itsTrue)) return 0;
 			*passIC = searchIC;
 			pos = searchPos;
 		case pass_endTest:
@@ -889,8 +894,8 @@ passDoTest(const TranslationTableHeader *table, int pos, const InString *input,
 			if (_lou_handlePassVariableTest(*passInstructions, passIC, &itsTrue)) break;
 			return 0;
 		}
-		if ((!not&&!itsTrue) || (not&&itsTrue)) return 0;
-		not = 0;
+		if ((!notOperator && !itsTrue) || (notOperator && itsTrue)) return 0;
+		notOperator = 0;
 	}
 	return 0;
 }
@@ -1186,12 +1191,6 @@ _lou_translate(const char *tableList, const char *displayTableList,
 	} else
 		memset(typebuf, 0, input.length * sizeof(formtype));
 
-	if (!(wordBuffer = _lou_allocMem(alloc_wordBuffer, 0, input.length, *outlen)))
-		return 0;
-
-	if (!(emphasisBuffer = _lou_allocMem(alloc_emphasisBuffer, 0, input.length, *outlen)))
-		return 0;
-
 	if (!(spacing == NULL || *spacing == 'X'))
 		srcSpacing = (unsigned char *)spacing;
 	else
@@ -1273,6 +1272,11 @@ _lou_translate(const char *tableList, const char *displayTableList,
 					&realInlen, &cursorPosition, &cursorStatus, mode);
 			break;
 		case 1: {
+			if (!(wordBuffer = _lou_allocMem(alloc_wordBuffer, 0, input.length, *outlen)))
+				return 0;
+			if (!(emphasisBuffer = _lou_allocMem(
+						  alloc_emphasisBuffer, 0, input.length, *outlen)))
+				return 0;
 			goodTrans = translateString(table, mode, currentPass, &input, &output,
 					passPosMapping, typebuf, srcSpacing, destSpacing, wordBuffer,
 					emphasisBuffer, haveEmphasis, &realInlen, &cursorPosition,
@@ -1595,6 +1599,27 @@ brailleIndicatorDefined(TranslationTableOffset offset,
 	return 1;
 }
 
+/**
+ * Return 1 if both `indicator1` and `indicator2` are defined and use the same dot
+ * pattern. Otherwise return 0.
+ */
+static int
+isIndicatorEqual(TranslationTableOffset indicator1, TranslationTableOffset indicator2,
+		const TranslationTableHeader *table) {
+	const TranslationTableRule *indicatorRule1;
+	const TranslationTableRule *indicatorRule2;
+
+	if (brailleIndicatorDefined(indicator1, table, &indicatorRule1) &&
+			brailleIndicatorDefined(indicator2, table, &indicatorRule2) &&
+			indicatorRule1->dotslen == indicatorRule2->dotslen &&
+			!memcmp(&indicatorRule1->charsdots[0], &indicatorRule2->charsdots[0],
+					indicatorRule1->dotslen * CHARSIZE)) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 static int
 capsletterDefined(const TranslationTableHeader *table) {
 	return table->emphRules[MAX_EMPH_CLASSES][letterOffset];
@@ -1779,7 +1804,7 @@ noCompbrlAhead(const TranslationTableHeader *table, int pos, int mode,
 				const TranslationTableCharacter *character1;
 				const TranslationTableCharacter *character2;
 				testRule = (TranslationTableRule *)&table->ruleArea[ruleOffset];
-				for (k = 0; k < testRule->charslen; k++) {
+				for (k = 0; k < testRule->charslen && k < length; k++) {
 					character1 = getChar(testRule->charsdots[k], table);
 					character2 = getChar(input->chars[p + k], table);
 					if (toLowercase(table, character1) != toLowercase(table, character2))
@@ -2265,7 +2290,7 @@ undefinedCharacter(widechar c, const TranslationTableHeader *table, int pos,
 
 	const char *text = (mode & noUndefined) ? "" : _lou_showString(&c, 1, 1);
 	size_t length = strlen(text);
-	widechar dots[length];
+	widechar dots[length == 0 ? 1 : length];
 
 	for (unsigned int k = 0; k < length; k += 1) {
 		dots[k] = 0;
@@ -2348,11 +2373,16 @@ doCompbrl(const TranslationTableHeader *table, int *pos, const InString *input,
 		output->length = 0;
 	}
 	*insertEmphasesFrom = lastWord->emphasisInPos;
-	for (stringStart = *pos; stringStart >= 0; stringStart--)
-		if (checkCharAttr(input->chars[stringStart], CTC_Space, table)) break;
-	stringStart++;
-	for (stringEnd = *pos; stringEnd < input->length; stringEnd++)
-		if (checkCharAttr(input->chars[stringEnd], CTC_Space, table)) break;
+	// just in case word starts with space
+	while (checkCharAttr(input->chars[*pos], CTC_Space, table)) (*pos)++;
+	stringStart = *pos;
+	while (stringStart > 0 &&
+			!checkCharAttr(input->chars[stringStart - 1], CTC_Space, table))
+		stringStart--;
+	stringEnd = *pos;
+	while (stringEnd < input->length &&
+			!checkCharAttr(input->chars[stringEnd], CTC_Space, table))
+		stringEnd++;
 	return doCompTrans(stringStart, stringEnd, table, pos, input, output, posMapping,
 			emphasisBuffer, transRule, cursorPosition, cursorStatus, mode);
 }
@@ -3303,10 +3333,9 @@ markEmphases(const TranslationTableHeader *table, const InString *input,
 }
 
 static void
-insertEmphasisSymbol(const EmphasisInfo *buffer, formtype *typebuf, const int at,
-		const EmphasisClass *class, const TranslationTableHeader *table, int pos,
-		const InString *input, OutString *output, int *posMapping, int *cursorPosition,
-		int *cursorStatus) {
+insertEmphasisSymbol(const EmphasisInfo *buffer, const int at, const EmphasisClass *class,
+		const TranslationTableHeader *table, int pos, const InString *input,
+		OutString *output, int *posMapping, int *cursorPosition, int *cursorStatus) {
 	if (buffer[at].symbol & class->value) {
 		const TranslationTableRule *indicRule;
 		if (brailleIndicatorDefined(
@@ -3410,7 +3439,7 @@ static void
 insertEmphasesAt(int begin, int end, int caps, int other, const int at,
 		const TranslationTableHeader *table, int pos, const InString *input,
 		OutString *output, int *posMapping, const EmphasisInfo *emphasisBuffer,
-		formtype *typebuf, int *cursorPosition, int *cursorStatus) {
+		int *cursorPosition, int *cursorStatus) {
 
 	/* The order of inserting the end symbols must be the reverse
 	 * of the insertions of the begin symbols so that they will
@@ -3480,9 +3509,8 @@ insertEmphasesAt(int begin, int end, int caps, int other, const int at,
 			if ((emphasisBuffer[at].begin | emphasisBuffer[at].end |
 						emphasisBuffer[at].word | emphasisBuffer[at].symbol) &
 					table->emphClasses[i].value)
-				insertEmphasisSymbol(emphasisBuffer, typebuf, at, &table->emphClasses[i],
-						table, pos, input, output, posMapping, cursorPosition,
-						cursorStatus);
+				insertEmphasisSymbol(emphasisBuffer, at, &table->emphClasses[i], table,
+						pos, input, output, posMapping, cursorPosition, cursorStatus);
 	}
 
 	if (begin && caps) {
@@ -3498,8 +3526,8 @@ insertEmphasesAt(int begin, int end, int caps, int other, const int at,
 					emphClass->value) {
 				insertEmphasisBegin(emphasisBuffer, at, emphClass, table, pos, input,
 						output, posMapping, cursorPosition, cursorStatus);
-				insertEmphasisSymbol(emphasisBuffer, typebuf, at, emphClass, table, pos,
-						input, output, posMapping, cursorPosition, cursorStatus);
+				insertEmphasisSymbol(emphasisBuffer, at, emphClass, table, pos, input,
+						output, posMapping, cursorPosition, cursorStatus);
 			}
 		}
 	}
@@ -3520,8 +3548,10 @@ checkNumericMode(const TranslationTableHeader *table, int pos, const InString *i
 	if (!*numericMode) {
 		if (checkCharAttr(input->chars[pos], CTC_Digit | CTC_LitDigit, table)) {
 			*numericMode = 1;
-			/* if the noContractSign is defined disable contraction */
-			if (table->noContractSign) *dontContract = 1;
+			/* if the nocontractsign is defined and it is the same as the nonumsign then
+			   disable contraction */
+			if (isIndicatorEqual(table->noContractSign, table->noNumberSign, table))
+				*dontContract = 1;
 			for_updatePositions(&indicRule->charsdots[0], 0, indicRule->dotslen, 0, pos,
 					input, output, posMapping, cursorPosition, cursorStatus);
 		} else if (checkCharAttr(input->chars[pos], CTC_NumericMode, table)) {
@@ -3544,9 +3574,7 @@ checkNumericMode(const TranslationTableHeader *table, int pos, const InString *i
 					CTC_Digit | CTC_LitDigit | CTC_NumericMode | CTC_MidEndNumericMode,
 					table)) {
 			*numericMode = 0;
-			if (!brailleIndicatorDefined(table->noContractSign, table, &indicRule))
-				*dontContract = 0;
-			if (brailleIndicatorDefined(table->noContractSign, table, &indicRule))
+			if (brailleIndicatorDefined(table->noNumberSign, table, &indicRule))
 				if (checkCharAttr(input->chars[pos], CTC_NumericNoContract, table))
 					for_updatePositions(&indicRule->charsdots[0], 0, indicRule->dotslen,
 							0, pos, input, output, posMapping, cursorPosition,
@@ -3662,18 +3690,18 @@ translateString(const TranslationTableHeader *table, int mode, int currentPass,
 		for (int at = insertEmphasesFrom; at <= pos; at++) {
 			/* insert caps end indicator */
 			insertEmphasesAt(0, 1, 1, 0, at, table, pos, input, output, posMapping,
-					emphasisBuffer, typebuf, cursorPosition, cursorStatus);
+					emphasisBuffer, cursorPosition, cursorStatus);
 			if (haveEmphasis) {
 				/* insert emphasis end indicator */
 				insertEmphasesAt(0, 1, 0, 1, at, table, pos, input, output, posMapping,
-						emphasisBuffer, typebuf, cursorPosition, cursorStatus);
+						emphasisBuffer, cursorPosition, cursorStatus);
 				/* insert emphasis start indicator */
 				insertEmphasesAt(1, 0, 0, 1, at, table, pos, input, output, posMapping,
-						emphasisBuffer, typebuf, cursorPosition, cursorStatus);
+						emphasisBuffer, cursorPosition, cursorStatus);
 			}
 			if (at < pos)
 				insertEmphasesAt(1, 0, 1, 0, at, table, pos, input, output, posMapping,
-						emphasisBuffer, typebuf, cursorPosition, cursorStatus);
+						emphasisBuffer, cursorPosition, cursorStatus);
 		}
 		insertEmphasesFrom = pos + 1;
 		/* insert grade 1 mode indicator (nocontractsign) before contraction */
@@ -3689,7 +3717,7 @@ translateString(const TranslationTableHeader *table, int mode, int currentPass,
 			goto failure;
 		/* insert caps start indicator */
 		insertEmphasesAt(1, 0, 1, 0, pos, table, pos, input, output, posMapping,
-				emphasisBuffer, typebuf, cursorPosition, cursorStatus);
+				emphasisBuffer, cursorPosition, cursorStatus);
 		/* insert number sign (not if numericmodechars, midnumericmodechars or
 		 * numericnocontchars has been defined) */
 		if (!table->usesNumericMode)
@@ -3948,18 +3976,18 @@ translateString(const TranslationTableHeader *table, int mode, int currentPass,
 	for (int at = insertEmphasesFrom; at <= pos; at++) {
 		/* insert caps end indicator */
 		insertEmphasesAt(0, 1, 1, 0, at, table, pos, input, output, posMapping,
-				emphasisBuffer, typebuf, cursorPosition, cursorStatus);
+				emphasisBuffer, cursorPosition, cursorStatus);
 		if (haveEmphasis) {
 			/* insert emphasis end indicator */
 			insertEmphasesAt(0, 1, 0, 1, at, table, pos, input, output, posMapping,
-					emphasisBuffer, typebuf, cursorPosition, cursorStatus);
+					emphasisBuffer, cursorPosition, cursorStatus);
 			/* insert emphasis start indicator */
 			insertEmphasesAt(1, 0, 0, 1, at, table, pos, input, output, posMapping,
-					emphasisBuffer, typebuf, cursorPosition, cursorStatus);
+					emphasisBuffer, cursorPosition, cursorStatus);
 		}
 		/* insert caps start indicator */
 		insertEmphasesAt(1, 0, 1, 0, at, table, pos, input, output, posMapping,
-				emphasisBuffer, typebuf, cursorPosition, cursorStatus);
+				emphasisBuffer, cursorPosition, cursorStatus);
 	}
 
 failure:

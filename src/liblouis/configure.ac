@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.68)
-AC_INIT([Liblouis], [3.21.0], [liblouis-liblouisxml@freelists.org], [liblouis], [http://www.liblouis.org])
+AC_INIT([Liblouis], [3.24.0], [liblouis-liblouisxml@freelists.org], [liblouis], [http://www.liblouis.org])
 AC_CONFIG_SRCDIR([liblouis/lou_backTranslateString.c])
 AM_CONFIG_HEADER(liblouis/config.h)
 
@@ -32,6 +32,16 @@ AC_ARG_WITH([yaml],
   [with_yaml=$withval],
   [])
 
+# Check if the user wants to enable coverage
+AC_ARG_WITH([coverage],
+    [AS_HELP_STRING([--with-coverage], [enable clang coverage in the fuzzer tests (also add coverage to lib sources) @<:@default=no@:>@])],
+    [])
+
+# Check if the user wants to compile fuzzer
+AC_ARG_WITH([fuzzer],
+    [AS_HELP_STRING([--with-fuzzer], [enable fuzzer for function lou_translateString @<:@default=no@:>@])],
+    [])
+
 # Checks for libraries.
 if test "x$with_yaml" == xno; then
   AC_DEFINE([WITHOUT_YAML],[1],[Disable YAML tests])
@@ -49,6 +59,14 @@ if test x$ac_cv_lib_yaml_yaml_parser_initialize != xyes; then
   *) AC_MSG_WARN([libyaml was not found. YAML tests will be skipped]);;
   esac
 fi
+
+# Check for coverage 
+AM_CONDITIONAL(USE_COVERAGE, [test x"$with_coverage" = xyes])
+
+# Check for fuzzer 
+AC_MSG_CHECKING([whether to enable fuzzer])
+AS_IF([test "x$with_fuzzer" = "xyes" && test "$CC" = "clang" && test "$CXX" = "clang++"], AC_MSG_RESULT([yes]), AC_MSG_RESULT([no]))
+AM_CONDITIONAL(USE_FUZZER, [test "x$with_fuzzer" = "xyes" && test "$CC" = "clang" && test "$CXX" = "clang++"])
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -77,7 +95,7 @@ LIBLOUIS_CURRENT=20
 
 # increment any time the source changes; set to 0 if you increment
 # CURRENT
-LIBLOUIS_REVISION=9
+LIBLOUIS_REVISION=12
 
 # increment if any interfaces have been added; set to 0 if any
 # interfaces have been changed or removed. removal has precedence over
@@ -115,9 +133,9 @@ done
 # define an additional recursive make target to format the sources.
 # Also check if clang-format is installed
 AM_EXTRA_RECURSIVE_TARGETS([format-sources])
-# prefer version 9 of clang-format as it is part of any release since ubuntu 20.04
-AC_CHECK_PROGS([SOURCE_FORMATTER], [clang-format-9 clang-format])
-AM_CONDITIONAL([HAVE_SOURCE_FORMATTER], [test x$SOURCE_FORMATTER = xclang-format -o x$SOURCE_FORMATTER = xclang-format-9])
+# prefer version 14 of clang-format as it is part of Ubuntu 22.04 LTS
+AC_CHECK_PROGS([SOURCE_FORMATTER], [clang-format-14 clang-format])
+AM_CONDITIONAL([HAVE_SOURCE_FORMATTER], [test x$SOURCE_FORMATTER = xclang-format -o x$SOURCE_FORMATTER = xclang-format-14])
 
 # GNU help2man creates man pages from --help output; in many cases,
 # this is sufficient, and obviates the need to maintain man pages

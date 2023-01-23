@@ -318,7 +318,7 @@ tests:
   - ['\x000a', '\x0020']
   - ['\x000c', '\x0020']
   - ['\x000d', '\x0020']
-table: da-dk-g08.ctb,spaces.uti
+table: da-dk-g08_1993.ctb,spaces.uti
 flags: {testmode: bothDirections}
 tests:
   - ['\x0009', '⣊']
@@ -328,7 +328,7 @@ tests:
   - ['\x000d', '⡒']
   - ['\x0020', '\x0020']
   - ['\x00a0', '⢞']
-table: da-dk-g16-lit.ctb
+table: da-dk-g16-lit_1993.ctb
 flags: {testmode: bothDirections}
 tests:
   - ['\x0009', '⣊']
@@ -338,7 +338,7 @@ tests:
   - ['\x000d', '⡒']
   - ['\x0020', '\x0020']
   - ['\x00a0', 'a']
-table: da-dk-g16.ctb
+table: da-dk-g16_1993.ctb
 flags: {testmode: bothDirections}
 tests:
   - ['\x0009', '⣊']
@@ -348,7 +348,7 @@ tests:
   - ['\x000d', '⡒']
   - ['\x0020', '\x0020']
   - ['\x00a0', 'a']
-table: da-dk-g18.ctb,spaces.uti
+table: da-dk-g18_1993.ctb,spaces.uti
 flags: {testmode: bothDirections}
 tests:
   - ['\x0009', '⣊']
@@ -358,7 +358,7 @@ tests:
   - ['\x000d', '⡒']
   - ['\x0020', '\x0020']
   - ['\x00a0', '⢞']
-table: da-dk-g26-lit.ctb
+table: da-dk-g26-lit_1993.ctb
 flags: {testmode: bothDirections}
 tests:
   - ['\x0009', '⣊']
@@ -368,7 +368,7 @@ tests:
   - ['\x000d', '⡒']
   - ['\x0020', '\x0020']
   - ['\x00a0', 'a']
-table: da-dk-g26.ctb
+table: da-dk-g26_1993.ctb
 flags: {testmode: bothDirections}
 tests:
   - ['\x0009', '⣊']
@@ -378,7 +378,7 @@ tests:
   - ['\x000d', '⡒']
   - ['\x0020', '\x0020']
   - ['\x00a0', 'a']
-table: da-dk-g26l-lit.ctb
+table: da-dk-g26l-lit_1993.ctb
 flags: {testmode: bothDirections}
 tests:
   - ['\x0009', '⣊']
@@ -388,7 +388,7 @@ tests:
   - ['\x000d', '⡒']
   - ['\x0020', '\x0020']
   - ['\x00a0', 'a']
-table: da-dk-g26l.ctb
+table: da-dk-g26l_1993.ctb
 flags: {testmode: bothDirections}
 tests:
   - ['\x0009', '⣊']
@@ -398,7 +398,7 @@ tests:
   - ['\x000d', '⡒']
   - ['\x0020', '\x0020']
   - ['\x00a0', 'a']
-table: da-dk-g28.ctb,spaces.uti
+table: da-dk-g28_1993.ctb,spaces.uti
 flags: {testmode: bothDirections}
 tests:
   - ['\x0009', '⣊']
@@ -408,7 +408,7 @@ tests:
   - ['\x000d', '⡒']
   - ['\x0020', '\x0020']
   - ['\x00a0', '⢞']
-table: da-dk-g28l.ctb,spaces.uti
+table: da-dk-g28l_1993.ctb,spaces.uti
 flags: {testmode: bothDirections}
 tests:
   - ['\x0009', '⣊']
@@ -1626,33 +1626,6 @@ tests:
   - ['\x2029', '\x0020']
   - ['\x202f', '\x0020']
   - ['\x205f', '\x0020']
-table: pa.tbl
-flags: {testmode: bothDirections}
-tests:
-  - ['\x0009', '9']
-  - ['\x0020', '\x0020']
-  - ['\x00a0', 'a']
-flags: {testmode: forward}
-tests:
-  - ['\x000a', '\x0020']
-  - ['\x000b', '\x0020']
-  - ['\x000c', '\x0020']
-  - ['\x000d', '\x0020']
-  - ['\x2000', '\x0020']
-  - ['\x2001', '\x0020']
-  - ['\x2002', '\x0020']
-  - ['\x2003', '\x0020']
-  - ['\x2004', '\x0020']
-  - ['\x2005', '\x0020']
-  - ['\x2006', '\x0020']
-  - ['\x2007', '\x0020']
-  - ['\x2008', '\x0020']
-  - ['\x2009', '\x0020']
-  - ['\x200a', '\x0020']
-  - ['\x2028', '\x0020']
-  - ['\x2029', '\x0020']
-  - ['\x202f', '\x0020']
-  - ['\x205f', '\x0020']
 table: pi.tbl
 flags: {testmode: bothDirections}
 tests:
@@ -1839,7 +1812,7 @@ tests:
   - ['\x0009', '\x0020']
   - ['\x000a', '\x0020']
   - ['\x000d', '\x0020']
-table: sk.tbl
+table: sk-g1.ctb
 flags: {testmode: bothDirections}
 tests:
   - ['\x0009', '9']
@@ -1894,16 +1867,6 @@ tests:
 flags: {testmode: forward}
 tests:
   - ['\x00a0', '\x0020']
-table: sv.tbl
-flags: {testmode: bothDirections}
-tests:
-  - ['\x0020', '\x0020']
-  - ['\x00a0', 'a']
-flags: {testmode: forward}
-tests:
-  - ['\x0009', '\x0020']
-  - ['\x000a', '\x0020']
-  - ['\x000d', '\x0020']
 table: ta-ta-g1.ctb
 flags: {testmode: bothDirections}
 tests:

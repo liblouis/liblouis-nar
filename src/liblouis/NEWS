@@ -1,5 +1,237 @@
 liblouis NEWS -- history of user-visible changes.  	-*- org -*-
 
+* Noteworthy changes in release 3.24.0 (2022-12-05)
+This release contains major updates to Hungarian, UEB, and Chinese
+bopomofo braille. Danish has been completely reworked and there is now
+support for the Danish braille standard 2022. There are also some new
+tables so that liblouis can now generate Georgian computer braille,
+Swahili (Kenya) and Chichewa (Malawi). Aside from that there is the
+usual assortment of code cleanups and bug fixes.
+
+I'd like to thank everybody for helping to bring liblouis forward.
+
+For a detailed list of all the changes refer to [[https://github.com/liblouis/liblouis/milestone/34?closed=1][the list of closed
+issues]].
+
+** Braille table improvements
+- New grade 1, 1.2, 1.3, 1.4, 1.5 and 2 tables for Swahili (Kenya) and
+  grade 1 table for Chichewa (Malawi) thanks to Jake Kyle, Dipendra
+  Manocha and Martin Kieti.
+- Improvements to Hungarian thanks to Attila Hammer.
+- Update braille patterns of some Chinese characters and phrases in
+  the Chinese bopomofo braille table thanks to Bo-Cheng Jhan.
+- Add experimental Georgian computer braille table thanks to Harris
+  Mowbray and Mariam Mikiashvili.
+- Updated the Danish tables to the new 2022 Danish braille standard
+  thanks to Bue Vester-Andersen.
+  - Limited contraction level (grade 2l or 1.5) is no longer part of
+    the Danish braille standard 2022.
+  - There is no longer any need for "literary" tables. In Danish
+    braille, capital letters are now always indicated, and steps have
+    been taken in the standard to ensure better back-translation.
+  - As requested by The Danish Braille Committee, the tables for the
+    1993 standard will be kept as an option for at least a year. All
+    the 1993 tables have been renamed to include "_1993" in the
+    filename, so the new tables will be used as default.
+- Improvements to UEB thanks to James Bowden.
+  - Add new sign for German sharp S (ICEB July 2022)
+  - Fix a couple of acronyms which require grade 1 indicator (LLB, LLP)
+  - Fix placement of numeral sign in letters comma digits
+  - Review rules for "under" and "there" contractions
+** Deprecation notice
+- None
+** Backwards incompatible changes
+- None
+** New, renamed or removed tables
+*** New
+- sw-ke-g1-2.ctb
+- sw-ke-g1-3.ctb
+- sw-ke-g1-4.ctb
+- sw-ke-g1-5.ctb
+- sw-ke-g1.utb
+- sw-ke-g2.ctb
+- ka.utb
+- ny-mw.utb
+- The following files now all refer to the corresponding tables for
+  Danish braille 2022:
+  - da-dk-g08.ctb
+  - da-dk-g16.ctb
+  - da-dk-g18.ctb
+  - da-dk-g26.ctb
+  - da-dk-g28.ctb
+  - da-dk-octobraille.dis
+*** Renamed
+- The old Danish tables for the now deprecated 1993 standard have been
+  renamed to include "1993" in the filename:
+  - da-dk-g08.ctb -> da-dk-g08_1993.ctb
+  - da-dk-g16.ctb -> da-dk-g16_1993.ctb
+  - da-dk-g16-lit.ctb -> da-dk-g16-lit_1993.ctb
+  - da-dk-g18.ctb -> da-dk-g18_1993.ctb
+  - da-dk-g26.ctb -> da-dk-g26_1993.ctb
+  - da-dk-g26-lit.ctb -> da-dk-g26-lit_1993.ctb
+  - da-dk-g26l.ctb -> da-dk-g26l_1993.ctb
+  - da-dk-g26l-lit.ctb -> da-dk-g26l-lit_1993.ctb
+  - da-dk-g28.ctb -> da-dk-g28_1993.ctb
+  - da-dk-g28l.ctb -> da-dk-g28l_1993.ctb
+  - da-dk-octobraille.dis -> da-dk-octobraille_1993.dis
+*** Removed
+None
+
+* Noteworthy changes in release 3.23.0 (2022-09-05)
+This release contains significant updates to many existing braille
+tables (Chinese bopomofo, Hungarian, Japanese, Russian, Swedish, UEB
+grade 2 Ukrainian). On top of that it also contains new tables for
+/Chinese Common Braille Scheme/, Kinyarwanda and Luganda thanks to
+Cary-Rowen and Jake Kyle. Behind the scenes Samuel Thibault has been
+working tirelessly to fix memory related bugs.
+
+I'd like to thank everybody for helping to bring liblouis forward.
+
+For a detailed list of all the changes refer to [[https://github.com/liblouis/liblouis/milestone/33?closed=1][the list of closed
+issues]].
+
+** New features
+- None
+** Bug fixes
+- Fix a problem in the parsing of faulty unbalanced context
+  expressions. Thanks to Samuel Thibault.
+- Fix a buffer overflow problem when ~output.length~ is larger than
+  ~input.length~. Thanks to Samuel Thibault.
+- Fix an endless loop in the handling of computer braille. Thanks to
+  Bert Frees.
+** Braille table improvements
+- Remove computer braille from Japanese Kantenji as it is not part of
+  the standard. Thanks to Kensaku Yoza.
+- Bring Swedish tables up to date with the latest standard published
+  by Punktskriftsnämnden (the Swedish Braille Authority) in 2009. The
+  table for uncontracted braille was replaced and new tables for
+  (partially and fully) contracted braille have been added. Thanks to
+  David Renström from Insyn Scandinavia AB.
+- Improvements to Hungarian (added more exceptions) and migration to
+  the ~nonumsign~ opcode thanks to Attila Hammer.
+- Fixed a bug in the Ukrainian table that led to wrong translation of
+  some uppercase letters. Thanks to Andrey Yakuboy and Bert Frees.
+- Augment the UEB grade 2 tables to resolve an ambiguity between lower
+  groupsigns and punctuation at the beginning of words by placing a letter
+  sign at the front of punctuation. This resolves an ambiguity between, for
+  example, "discount" and ".count". Thanks to Krzysztof Drewniak.
+- Add a new table for /Chinese Common Braille Scheme/ which is a type
+  of braille used for spelling Mandarin Chinese. It is a variant of
+  the /Chinese Current Braille System/ but has more perfect marking
+  rules and produces less ambiguity than the latter. For more
+  information see the comments in ~zhcn-cbs.ctb~. Thanks to Cary-Rowen
+  and Frank.
+- Updates to the Chinese bopomofo braille table thanks to Bo-Cheng
+  Jhan:
+  - Update braille patterns of some Chinese characters and phrases
+  - Add braille patterns for various Greek symbols
+  - Add "Math rules" section and the mixed number rule
+  - Add braille patterns for ☐ (⣏⣀⣹), ☑ (⣏⣿⣹), and ☒ (⣏⣭⣹)
+- New table for Kinyarwanda braille thanks to Jake Kyle from Compass
+  Braille.
+- New table for Luganda braille thanks to Jake Kyle from Compass
+  Braille.
+- Improvements to the Russian contracted braille table
+  thanks to Andrey Yakuboy:
+  - Now prefixes "из" and "без" are correctly contracted
+    before hard sign (ъ).
+  - Fixed a contraction for word "кое-где", now it is contracted
+    according to rules.
+  - Other minor fixes and improvements.
+** Other changes
+- None
+** Deprecation notice
+- None
+** Backwards incompatible changes
+- None
+** Invisible changes
+- None
+** New, renamed or removed tables
+*** New
+- zhcn-cbs.ctb
+- lg-ug-g1.utb
+- rw-rw-g1.utb
+- sv-g0.utb
+- sv-g1.ctb
+- sv-g2.ctb
+*** Renamed
+None
+*** Removed
+- Se-Se-g1.utb
+
+* Noteworthy changes in release 3.22.0 (2022-06-06)
+This is a major release. On the Braille tables side there is a new
+table for German grade 2 with capitalization and there are updates to
+the Dutch, German Hungarian, Punjabi, Russian, UK Braille Computer
+Notation and Slovak tables. Christian added a new opcode to indicate
+the end of a number where the number doesn't end at a space character.
+Last but not least Samuel, Martin and Han have put a lot of work into
+checking for and fixing memory problems.
+
+I'd like to thank everybody for helping to bring liblouis forward.
+
+For a detailed list of all the changes refer to [[https://github.com/liblouis/liblouis/milestone/32?closed=1][the list of closed
+issues]].
+
+** New features
+- Add a new opcode ~nonumsign~ that helps with indicating the end of a
+  number when it doesn't occur at the end at the end of a word such as
+  '123abc' for example. For more details see the documentation. Thanks
+  to Christian Egli.
+** Bug fixes
+- Prevent a memory overflow in ~compilePassOpcode~ thanks to Martin
+  Gieseking. This was reported in [[https://github.com/advisories/GHSA-xrp8-mw8v-p6mq][CVE-2022-26981]] and should now be
+  fixed.
+- Prevent processing of characters beyond the string end in
+  ~parseChars~ thanks to Martin Gieseking.
+- Prevent an invalid memory writes in ~compileRule~. Thanks to Han
+  Zheng for reporting it and to Christian Egli for fixing it.
+** Braille table improvements
+- Improvements to German braille:
+  - Improve handling of single letters in grade 2 thanks to Mischa
+    Künzle.
+  - Improve handling of emphasis thanks to Bert Frees.
+  - Add a table for grade 2 /with capitalization/ thanks to Christian
+    Egli.
+- Fix a problem with Ñ in Dutch braille thanks to Paul Rambags
+- Updated Slovak Braille table to be inline with the 2021 Slovak
+  braille usage guidelines.
+- Fixed a problem with the '+' symbol in UK Braille Computer Notation
+  thanks to Mario Arias.
+- Major improvements to the Hungarian braille tables thanks to Attila
+  Hammer.
+- Make Punjabi table to behave the same as Duxbury in forward
+  translation and more reliably than Duxbury in back
+  translation. Thanks to Jake Kyle.
+- Improvements to the Russian and other Cyrillic tables thanks to
+  Andrey Yakuboy:
+  - Now all Russian based tables return braille Unicode braille by
+    default when forward translating, no need to include
+    ~ru-unicode.dis~ manually.
+  - French letters (æ, ë and ï) have been added to the Russian
+    literary braille table.
+** Other changes
+- Integrate sanitizer tests in the CI pipeline and fix a large number
+  of memory problems (leaks, overflow and undefined behavior) thanks
+  to Samuel Thibault.
+- Removed the "experimental" label from the functions ~lou_indexTables~,
+  ~lou_findTable~, ~lou_findTables~, ~lou_getTableInfo~ and
+  ~lou_listTables~ (the meta data query API).
+- Fix a build problem when using Clang 11 on macOS thanks to Robert
+  Scott.
+** Deprecation notice
+- None
+** Backwards incompatible changes
+- None
+** Invisible changes
+** New, renamed or removed tables
+*** New
+- de-g2-detailed.ctb
+*** Renamed
+- None
+*** Removed
+- None
+
 * Noteworthy changes in release 3.21.0 (2022-03-07)
 This release sees major updates for Hungarian and German. The Swiss
 Library for the Blind, Visually Impaired and Print Disabled has agreed
@@ -63,7 +295,7 @@ issues]].
 *** Removed
 None
 
-* Noteworthy changes in release 3.20.0 (2021-16-06)
+* Noteworthy changes in release 3.20.0 (2021-12-06)
 This is a major release. Not only in terms of table additions and
 updates but also in the way the tables are written. Bert has replaced
 the ~uplow~ opcode with a more generalized ~base~ opcode. This clears
@@ -101,8 +333,8 @@ issues]].
   - use correct representation for fractions
   - change symbol used for underscore from dots 46 to 6
   - add U+2212 minus symbol (also to computer braille table)
-- Updates to the Chinese braille table (~zh-tw.ctb~) thanks to
-  Bo-Cheng Jhan.
+- Updates to the Chinese bopomofo braille table thanks to Bo-Cheng
+  Jhan.
   - Complete translation of CJK Radicals Supplement
   - Change the default braille pattern of '蛤' to ⠗⠜⠂
   - Correct the default braille pattern of many Chinese characters
@@ -710,8 +942,8 @@ issues]].
   - Ensured proper use of letsign in connection with accented letters.
   - Re-arranged and strengthened tests to include all Unicode
     characters defined in the tables.
-- Updates to the Chinese braille table (~zh-tw.ctb~) thanks to
-  Bo-Cheng Jhan, Coscell Kao and Victor Cai.
+- Updates to the Chinese bopomofo braille table thanks to Bo-Cheng
+  Jhan, Coscell Kao and Victor Cai.
 - New experimental German tables for grade 0 (Basisschrift) and grade
   1 (Vollschrift) that are more suitable for back-translation, thanks
   to Bue Vester-Andersen.
@@ -790,8 +1022,8 @@ None
     are adjacent to upper punctuation, for example: (hier.
 - New draft table for Dutch 8-dot computer braille thanks to Leonard
   de Ruijter.
-- Updates to the Chinese braille table (~zh-tw.ctb~) thanks to
-  Bo-Cheng Jhan, Coscell Kao, 特種兵, 黃偉豪, and Victor Cai.
+- Updates to the Chinese bopomofo braille table thanks to Bo-Cheng
+  Jhan, Coscell Kao, 特種兵, 黃偉豪, and Victor Cai.
 - Fixes to Polish grade 1, thanks to Łukasz Golonka
   - Removes some unneeded ~midnum~ symbols from the Polish Grade 1.
   - Fixes some symbols which weren't defined according to the

@@ -1,8 +1,12 @@
 name: Check the license of the tables
 
 on:
+  workflow_dispatch:
   push:
     branches: [ master ]
+    paths:
+      - 'tables/*'
+
   pull_request:
     branches: [ master ]
 

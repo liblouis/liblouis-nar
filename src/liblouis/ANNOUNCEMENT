@@ -1,7 +1,7 @@
-liblouis 3.21.0 has been released
+liblouis 3.24.0 has been released
 
 The liblouis developer team is proud to announce the liblouis release
-3.21.0. The release is available for download at:
+3.24.0. The release is available for download at:
 
 https://github.com/liblouis/liblouis/releases
 
@@ -18,68 +18,49 @@ liblouisutdml [2]_ deals with formatting of braille.
 Noteworthy changes in this release
 ==================================
 
-This release sees major updates for Hungarian and German. The Swiss
-Library for the Blind, Visually Impaired and Print Disabled has agreed
-to upstream their tables and Attila Hammer has adapted Hungarian to the
-latest standard. A bug in numeric mode was fixed which should it make
-more useful for languages other than UEB. Finally there are fixes for
-Norwegian and Danish.
+This release contains major updates to Hungarian, UEB, and Chinese
+bopomofo braille. Danish has been completely reworked and there is now
+support for the Danish braille standard 2022. There are also some new
+tables so that liblouis can now generate Georgian computer braille,
+Swahili (Kenya) and Chichewa (Malawi). Aside from that there is the
+usual assortment of code cleanups and bug fixes.
 
 I'd like to thank everybody for helping to bring liblouis forward.
 
 For a detailed list of all the changes refer to the list of closed
 issues [3]_.
 
-New features
-------------
-
--  New table for German 6-dot computer braille thanks to the Swiss
-   Library for the Blind, Visually Impaired and Print Disabled
-
-Bug fixes
----------
-
--  When numeric mode was enabled, i.e. when a table contains any of the
-   ``numericmodechars``, ``midnumericmodechars`` or
-   ``numericnocontchars`` opcodes, contraction was automatically
-   disabled. This is required for UEB but not necessarily so for other
-   braille systems (as mentioned in Issue 615).
-   This has now been changed so that contraction is only disabled if the
-   ``nocontractsign`` has been defined. Thanks to Christian Egli.
-
 Braille table improvements
 --------------------------
 
--  Fixed emphasis, section sign and dash between numbers in Danish
-   tables thanks to Bue Vester-Andersen.
--  Correct latin small letter sharp s in Norwegian thanks to Lars
-   Bjørndal and Dawn Renouf Bjørneby.
--  Major improvements to German Braille thanks to the Swiss Library for
-   the Blind, Visually Impaired and Print Disabled
+-  New grade 1, 1.2, 1.3, 1.4, 1.5 and 2 tables for Swahili (Kenya) and
+   grade 1 table for Chichewa (Malawi) thanks to Jake Kyle, Dipendra
+   Manocha and Martin Kieti.
+-  Improvements to Hungarian thanks to Attila Hammer.
+-  Update braille patterns of some Chinese characters and phrases in the
+   Chinese bopomofo braille table thanks to Bo-Cheng Jhan.
+-  Add experimental Georgian computer braille table thanks to Harris
+   Mowbray and Mariam Mikiashvili.
+-  Updated the Danish tables to the new 2022 Danish braille standard
+   thanks to Bue Vester-Andersen.
 
-   -  Improvements to emphasis handling in German tables and greatly
-      extended test coverage.
-   -  All the improvements from the tables formerly known as bidi tables
-      were merged in the main tables and are now used by both tables.
-      The bidi tables have been renamed to &quot;detailed&quot;.
-      Essentially the detailed tables provide capitalized Braille which
-      helps with the back-translation.
-   -  Upstream all improvements from the ``sbs-braille-tables``.
+   -  Limited contraction level (grade 2l or 1.5) is no longer part of
+      the Danish braille standard 2022.
+   -  There is no longer any need for "literary" tables. In Danish
+      braille, capital letters are now always indicated, and steps have
+      been taken in the standard to ensure better back-translation.
+   -  As requested by The Danish Braille Committee, the tables for the
+      1993 standard will be kept as an option for at least a year. All
+      the 1993 tables have been renamed to include ":sub:`1993`" in the
+      filename, so the new tables will be used as default.
 
--  Improvements to the Hungarian tables thanks to Attila Hammer.
+-  Improvements to UEB thanks to James Bowden.
 
-   -  Improved back-translation, notably of words containing special
-      consonants like &quot;szsz&quot; or &quot;ssz&quot;.
-   -  Extended the Hungarian grade 1 &quot;braille input&quot;
-      (back-translation aided by special extra dot patterns).
-   -  Implemented latest update to the Hungarian braille standard (for
-      example the characters &quot;\&quot; and &quot;|&quot; were
-      changed).
-
-Other changes
--------------
-
--  Make ``autogen.sh`` work on MacOS, thanks to Ken Perry
+   -  Add new sign for German sharp S (ICEB July 2022)
+   -  Fix a couple of acronyms which require grade 1 indicator (LLB,
+      LLP)
+   -  Fix placement of numeral sign in letters comma digits
+   -  Review rules for "under" and "there" contractions
 
 Deprecation notice
 ------------------
@@ -89,8 +70,7 @@ Deprecation notice
 Backwards incompatible changes
 ------------------------------
 
-Invisible changes
------------------
+-  None
 
 New, renamed or removed tables
 ------------------------------
@@ -98,13 +78,41 @@ New, renamed or removed tables
 New
 ~~~
 
--  de-comp6.utb
+-  sw-ke-g1-2.ctb
+-  sw-ke-g1-3.ctb
+-  sw-ke-g1-4.ctb
+-  sw-ke-g1-5.ctb
+-  sw-ke-g1.utb
+-  sw-ke-g2.ctb
+-  ka.utb
+-  ny-mw.utb
+-  The following files now all refer to the corresponding tables for
+   Danish braille 2022:
+
+   -  da-dk-g08.ctb
+   -  da-dk-g16.ctb
+   -  da-dk-g18.ctb
+   -  da-dk-g26.ctb
+   -  da-dk-g28.ctb
+   -  da-dk-octobraille.dis
 
 Renamed
 ~~~~~~~
 
--  de-g0-bidi.utb -&gt; de-g0-detailed.utb
--  de-g1-bidi.ctb -&gt; de-g1-detailed.ctb
+-  The old Danish tables for the now deprecated 1993 standard have been
+   renamed to include "1993" in the filename:
+
+   -  da-dk-g08.ctb -> da-dk-g08\ :sub:`1993`.ctb
+   -  da-dk-g16.ctb -> da-dk-g16\ :sub:`1993`.ctb
+   -  da-dk-g16-lit.ctb -> da-dk-g16-lit\ :sub:`1993`.ctb
+   -  da-dk-g18.ctb -> da-dk-g18\ :sub:`1993`.ctb
+   -  da-dk-g26.ctb -> da-dk-g26\ :sub:`1993`.ctb
+   -  da-dk-g26-lit.ctb -> da-dk-g26-lit\ :sub:`1993`.ctb
+   -  da-dk-g26l.ctb -> da-dk-g26l\ :sub:`1993`.ctb
+   -  da-dk-g26l-lit.ctb -> da-dk-g26l-lit\ :sub:`1993`.ctb
+   -  da-dk-g28.ctb -> da-dk-g28\ :sub:`1993`.ctb
+   -  da-dk-g28l.ctb -> da-dk-g28l\ :sub:`1993`.ctb
+   -  da-dk-octobraille.dis -> da-dk-octobraille\ :sub:`1993`.dis
 
 Removed
 ~~~~~~~
@@ -114,7 +122,7 @@ None
 Next release
 ============
 
-The next release will be published on June 6 2022 so please keep up the
+The next release will be published on March 6 2023 so please keep up the
 excellent work and keep those improvements coming.
 
 Share and Enjoy!
@@ -131,4 +139,4 @@ Footnotes
    https://github.com/liblouis/liblouisutdml
 
 .. [3]
-   https://github.com/liblouis/liblouis/milestone/31?closed=1
+   https://github.com/liblouis/liblouis/milestone/34?closed=1
