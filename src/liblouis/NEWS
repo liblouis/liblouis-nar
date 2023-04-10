@@ -1,5 +1,83 @@
 liblouis NEWS -- history of user-visible changes.  	-*- org -*-
 
+* Noteworthy changes in release 3.25.0 (2023-03-06)
+We dedicate this release to the memory of John Boyer, the original
+author of liblouis. Sadly he passed away recently. We owe him a
+tremendous amount of gratitude. Without him liblouis would not exist.
+
+A lot of work has gone into this release. We have quite a few security
+related fixes. Then there are updates to Dutch, Norwegian, Slovenian
+and Vietnamese. Attila, who never seems to get tired, updated the
+Hungarian tables and did some general cleanups in the tables.
+
+Also due to some mishap our domain expired and we could not re-acquire
+it. So we had to change our domain to ~liblouis.io~.
+
+I'd like to thank everybody for helping to bring liblouis forward.
+
+For a detailed list of all the changes refer to [[https://github.com/liblouis/liblouis/milestone/35?closed=1][the list of closed
+issues]].
+
+** New features
+** Bug fixes
+- Fixed several buffer overflow errors in ~lou_setDataPath~,
+  ~lou_logFile~ and ~resolveSubtable~ thanks to Marsman1996.
+** Braille table improvements
+- Fix a deprecation warning in Bulgarian 6 dots thanks to Attila
+  Hammer.
+- Fix two broken space replacement rules for ZERO WIDTH SPACE and WORD
+  JOINER thanks to Attila Hammer and Norbert Markus.
+- Fixes to Hungarian Braille exceptions and hyphenation thanks to
+  Attila Hammer. This results in a much improved back-translation of
+  capitalized words.
+- Support for both 8 and 6 dot math symbols in Hungarian thanks to
+  Norbert Markus.
+- Update Dutch 8-dot computer braille table to the 2022 standard
+  thanks to Leonard de Ruijter and the Dutch Braille Authority.
+- There are updates to the Norwegian braille standard. Most notably
+  URLs and email addresses are no longer surrounded by braille
+  patterns unless present in the original document. Thanks to Lars
+  Bjørndal.
+- Add some missing character definitions to Slovenian computer
+  braille, thanks to Jožef Gregorc.
+- Corrections and additions to Vietnamese thanks to Dang Hoai
+  Phúc. Includes a new computer braille table.
+** Other changes
+- Change the domain name from liblouis.org to liblouis.io thanks to
+  Christian Egli.
+- Simplify the Danish test to contain fewer files thanks to Bue
+  Vester-Andersen and Bert Frees.
+- Add the tests and the examples of the Python bindings to the
+  distribution tarball. Thanks to Rob Beezer for spotting this
+  oversight.
+** Deprecation notice
+- The ~lou_setDataPath~ and ~lou_getDataPath~ functions have been
+  deprecated. Please migrate to one of the other ways to set the table
+  search path:
+  - The recommended and most straightforward way to set the search
+    path is to set the ~LOUIS_TABLEPATH~ environment variable.
+  - You can also set a custom table resolver function through
+    ~lou_registerTableResolver~.
+  - If you use the metadata based query API and haven't set the
+    ~LOUIS_TABLEPATH~ environment variable, you can use the
+    ~lou_indexTables~ function to tell Liblouis which files (not
+    directories) to search.
+  - Finally, there is the fallback solution of using absolute file
+    paths.
+** Backwards incompatible changes
+- None
+** Invisible changes
+- None
+** New, renamed or removed tables
+*** New
+- vi-cb8.utb (replaces vi.ctb)
+
+*** Renamed
+None
+
+*** Removed
+- vi.ctb (replaced by vi-cb8.utb)
+
 * Noteworthy changes in release 3.24.0 (2022-12-05)
 This release contains major updates to Hungarian, UEB, and Chinese
 bopomofo braille. Danish has been completely reworked and there is now
