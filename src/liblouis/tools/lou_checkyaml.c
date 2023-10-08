@@ -365,18 +365,81 @@ read_flags(yaml_parser_t *parser, int *testmode) {
 	yaml_event_delete(&event);
 }
 
+#define XFAIL_NONE 0
+#define XFAIL_FORWARD 1
+#define XFAIL_BACKWARD 2
+#define XFAIL_BOTH 3
+
 static int
-read_xfail(yaml_parser_t *parser) {
+read_xfail_value(yaml_parser_t *parser) {
 	yaml_event_t event;
-	/* assume xfail true if there is an xfail key */
-	int xfail = 1;
+	int xfail = 1;	// assume a truthy value
+
 	if (!yaml_parser_parse(parser, &event) || (event.type != YAML_SCALAR_EVENT))
 		yaml_error(YAML_SCALAR_EVENT, &event);
 	if (!strcmp((const char *)event.data.scalar.value, "false") ||
 			!strcmp((const char *)event.data.scalar.value, "off"))
-		xfail = 0;
+		xfail = 0;	// only "false" and "off" are falsy values
 	yaml_event_delete(&event);
 	return xfail;
+}
+
+static int
+read_xfail(yaml_parser_t *parser) {
+	yaml_event_t event;
+	if (!yaml_parser_parse(parser, &event) ||
+			!(event.type == YAML_SCALAR_EVENT || event.type == YAML_MAPPING_START_EVENT))
+		error_at_line(EXIT_FAILURE, 0, file_name, event.start_mark.line + 1,
+				"Expected %s or %s (actual %s)", event_names[YAML_SCALAR_EVENT],
+				event_names[YAML_MAPPING_START_EVENT], event_names[event.type]);
+
+	/* xfail can be either a scalar value (`true` or any string, typically
+	   the failure reason) */
+	if (event.type == YAML_SCALAR_EVENT) {
+		/* assume xfail both if there is an xfail key */
+		int xfail = XFAIL_BOTH;
+		if (!strcmp((const char *)event.data.scalar.value, "false") ||
+				!strcmp((const char *)event.data.scalar.value, "off"))
+			xfail = XFAIL_NONE;
+		yaml_event_delete(&event);
+		return xfail;
+
+		/* or xfail can be a map such as {forward: true, backward: false} */
+	} else {  // event.type == YAML_MAPPING_START_EVENT
+		int parse_error = 1;
+		int xfail_forward = 0;	/* if either direction is not specified `false` */
+		int xfail_backward = 0; /* is assumed */
+		while ((parse_error = yaml_parser_parse(parser, &event)) &&
+				(event.type == YAML_SCALAR_EVENT)) {
+			if (strcmp((const char *)event.data.scalar.value, "forward") == 0) {
+				yaml_event_delete(&event);
+				xfail_forward = read_xfail_value(parser);
+			} else if (strcmp((const char *)event.data.scalar.value, "backward") == 0) {
+				yaml_event_delete(&event);
+				xfail_backward = read_xfail_value(parser);
+			} else {
+				error_at_line(EXIT_FAILURE, 0, file_name, event.start_mark.line + 1,
+						"Direction '%s' is not valid\n", event.data.scalar.value);
+				yaml_event_delete(&event);
+				break;
+			}
+		}
+		if (!parse_error) yaml_parse_error(parser);
+
+		if (event.type != YAML_MAPPING_END_EVENT)
+			yaml_error(YAML_MAPPING_END_EVENT, &event);
+		yaml_event_delete(&event);
+
+		if (xfail_forward && xfail_backward) {
+			return XFAIL_BOTH;
+		} else if (xfail_forward) {
+			return XFAIL_FORWARD;
+		} else if (xfail_backward) {
+			return XFAIL_BACKWARD;
+		} else {
+			return XFAIL_NONE;
+		}
+	}
 }
 
 static translationModes
@@ -622,7 +685,7 @@ read_options(yaml_parser_t *parser, int testmode, int wordLen, int translationLe
 	int parse_error = 1;
 
 	*mode = 0;
-	*xfail = 0;
+	*xfail = XFAIL_NONE;
 	*typeform = NULL;
 	*inPos = NULL;
 	*outPos = NULL;
@@ -706,12 +769,54 @@ read_options(yaml_parser_t *parser, int testmode, int wordLen, int translationLe
 }
 
 static void
+check_translation(yaml_event_t event, char *table, char *word, char *translation,
+		const char *display_table, char *description, formtype *typeform,
+		translationModes mode, int *expected_inputPos, int *expected_outputPos,
+		int cursorPos, int expected_cursorPos, int max_outlen, int real_inlen,
+		int direction, int xfail) {
+	int r = 0;
+	// FIXME: Note that the typeform array was constructed using the
+	// emphasis classes mapping of the last compiled table. This
+	// means that if we are testing multiple tables at the same time
+	// they must have the same mapping (i.e. the emphasis classes
+	// must be defined in the same order).
+	r = check(table, word, translation, .display_table = display_table,
+			.typeform = typeform, .mode = mode, .expected_inputPos = expected_inputPos,
+			.expected_outputPos = expected_outputPos, .cursorPos = cursorPos,
+			.expected_cursorPos = expected_cursorPos, .max_outlen = max_outlen,
+			.real_inlen = real_inlen, .direction = direction, .diagnostics = !xfail);
+
+	if (xfail != r) {
+		// FAIL or XPASS
+		if (description) fprintf(stderr, "%s\n", description);
+		error_at_line(0, 0, file_name, event.start_mark.line + 1,
+				(xfail ? "Unexpected Pass" : "Failure"));
+		errors++;
+		// on error print the table name, as it isn't always clear
+		// which table we are testing. You can can define a test
+		// for multiple tables.
+		fprintf(stderr, "Table: %s\n", table);
+		if (display_table) fprintf(stderr, "Display table: %s\n", display_table);
+		// add an empty line after each error
+		fprintf(stderr, "\n");
+	} else if (xfail && r && verbose) {
+		// XFAIL
+		// in verbose mode print expected failures
+		if (description) fprintf(stderr, "%s\n", description);
+		error_at_line(0, 0, file_name, event.start_mark.line + 1, "Expected Failure");
+		fprintf(stderr, "Table: %s\n", table);
+		if (display_table) fprintf(stderr, "Display table: %s\n", display_table);
+		fprintf(stderr, "\n");
+	}
+}
+
+static void
 read_test(yaml_parser_t *parser, char **tables, const char *display_table, int testmode) {
 	yaml_event_t event;
 	char *description = NULL;
 	char *word;
 	char *translation;
-	int xfail = 0;
+	int xfail = XFAIL_NONE;
 	translationModes mode = 0;
 	formtype *typeform = NULL;
 	int *inPos = NULL;
@@ -761,57 +866,38 @@ read_test(yaml_parser_t *parser, char **tables, const char *display_table, int t
 				event_names[YAML_SEQUENCE_END_EVENT], event_names[event.type]);
 	}
 
-	int result = 0;
 	char **table = tables;
+	int xfail_forward = (xfail == XFAIL_FORWARD || xfail == XFAIL_BOTH);
+	int xfail_backward = (xfail == XFAIL_BACKWARD || xfail == XFAIL_BOTH);
 	while (*table) {
-		int r;
-		if (testmode == MODE_HYPHENATION || testmode == MODE_HYPHENATION_BRAILLE) {
-			r = check_hyphenation(
+		switch (testmode) {
+		case MODE_HYPHENATION:
+		case MODE_HYPHENATION_BRAILLE:
+			check_hyphenation(
 					*table, word, translation, testmode == MODE_HYPHENATION_BRAILLE);
-
-		} else if (testmode == MODE_DISPLAY) {
-			r = check_display(*table, word, translation);
-		} else {
-			int direction = DIRECTION_FORWARD;
-			if (testmode == MODE_TRANSLATION_BACKWARD)
-				direction = DIRECTION_BACKWARD;
-			else if (testmode == MODE_TRANSLATION_BOTH_DIRECTIONS)
-				direction = DIRECTION_BOTH;
-			// FIXME: Note that the typeform array was constructed using the
-			// emphasis classes mapping of the last compiled table. This
-			// means that if we are testing multiple tables at the same time
-			// they must have the same mapping (i.e. the emphasis classes
-			// must be defined in the same order).
-			r = check(*table, word, translation, .display_table = display_table,
-					.typeform = typeform, .mode = mode, .expected_inputPos = inPos,
-					.expected_outputPos = outPos, .cursorPos = cursorPos,
-					.expected_cursorPos = cursorOutPos, .max_outlen = maxOutputLen,
-					.real_inlen = realInputLen, .direction = direction,
-					.diagnostics = !xfail);
+			break;
+		case MODE_DISPLAY:
+			check_display(*table, word, translation);
+			break;
+		case MODE_TRANSLATION_FORWARD:
+			check_translation(event, *table, word, translation, display_table,
+					description, typeform, mode, inPos, outPos, cursorPos, cursorOutPos,
+					maxOutputLen, realInputLen, DIRECTION_FORWARD, xfail_forward);
+			break;
+		case MODE_TRANSLATION_BACKWARD:
+			check_translation(event, *table, word, translation, display_table,
+					description, typeform, mode, inPos, outPos, cursorPos, cursorOutPos,
+					maxOutputLen, realInputLen, DIRECTION_BACKWARD, xfail_backward);
+			break;
+		case MODE_TRANSLATION_BOTH_DIRECTIONS:
+			check_translation(event, *table, word, translation, display_table,
+					description, typeform, mode, inPos, outPos, cursorPos, cursorOutPos,
+					maxOutputLen, realInputLen, DIRECTION_FORWARD, xfail_forward);
+			check_translation(event, *table, translation, word, display_table,
+					description, typeform, mode, outPos, inPos, cursorPos, cursorOutPos,
+					maxOutputLen, realInputLen, DIRECTION_BACKWARD, xfail_backward);
+			break;
 		}
-		if (xfail != r) {
-			// FAIL or XPASS
-			if (description) fprintf(stderr, "%s\n", description);
-			error_at_line(0, 0, file_name, event.start_mark.line + 1,
-					(xfail ? "Unexpected Pass" : "Failure"));
-			errors++;
-			// on error print the table name, as it isn't always clear
-			// which table we are testing. You can can define a test
-			// for multiple tables.
-			fprintf(stderr, "Table: %s\n", *table);
-			if (display_table) fprintf(stderr, "Display table: %s\n", display_table);
-			// add an empty line after each error
-			fprintf(stderr, "\n");
-		} else if (xfail && r && verbose) {
-			// XFAIL
-			// in verbose mode print expected failures
-			if (description) fprintf(stderr, "%s\n", description);
-			error_at_line(0, 0, file_name, event.start_mark.line + 1, "Expected Failure");
-			fprintf(stderr, "Table: %s\n", *table);
-			if (display_table) fprintf(stderr, "Display table: %s\n", display_table);
-			fprintf(stderr, "\n");
-		}
-		result |= r;
 		table++;
 		count++;
 	}

@@ -1,6 +1,6 @@
 # liblouis: Danish, table for 8 dots grade 2 forward and backward translation (2022)
 #
-#  Copyright (C) 2014, 2016-2022, Bue Vester-Andersen <bue@vester-andersen.dk>
+#  Copyright (C) 2014, 2016-2023, Bue Vester-Andersen <bue@vester-andersen.dk>
 #
 #  This file is part of liblouis.
 #
@@ -897,6 +897,10 @@ noback correct $U["-"] "\xf8fe"
 # Special characters that always need letsigns because they represent contractions
 always \x00a1 56-256 # inverted exclamationmark
 
+# Punctuation
+# Ensure word contractions followed by ! back-translate correctly
+postpunc ! 235
+
 #Special sequences, urls emails and file names.
 nocont $
 nocont \\ # line cannot end with a backslash
@@ -1059,9 +1063,9 @@ contraction hle
 word heller 125-123-1235
 begnum hlr 56-125-123-1235
 contraction hlr
-#word helt 125-2345
-#begnum ht 6-125-2345
-#contraction ht
+word helt 125-2345
+begnum ht 6-125-2345
+contraction ht
 word hendes 125-234
 begnum hs 56-125-234
 contraction hs
@@ -1076,8 +1080,8 @@ word hjælper 125-1234-156
 word hper =
 word hun 136
 word hvad 2456
-word hvilke 2456-13
-word hvk =
+word hvilke 2456-13-15
+word hvke =
 word hvilken 2456-13-126
 word hvken =
 word hvilket 2456-13-346

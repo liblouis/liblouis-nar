@@ -7,8 +7,13 @@ on:
     paths:
       - '**.h'
       - '**.c'
+      - 'liblouis/liblouis/liblouis.h.in'
   pull_request:
     branches: [ master ]
+    paths:
+      - '**.h'
+      - '**.c'
+      - 'liblouis/liblouis/liblouis.h.in'
 
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
@@ -20,7 +25,12 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+    - name: Harden Runner
+      uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
+      with:
+        egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+
+    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
     - name: Install dependencies
       run: sudo apt-get update -qq && sudo apt-get install -y clang-format-14
     - name: Autogen && configure

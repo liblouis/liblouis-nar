@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.68)
-AC_INIT([Liblouis], [3.25.0], [liblouis-liblouisxml@freelists.org], [liblouis], [http://www.liblouis.io])
+AC_INIT([Liblouis], [3.26.0], [liblouis-liblouisxml@freelists.org], [liblouis], [http://www.liblouis.io])
 AC_CONFIG_SRCDIR([liblouis/lou_backTranslateString.c])
 AM_CONFIG_HEADER(liblouis/config.h)
 
@@ -43,13 +43,13 @@ AC_ARG_WITH([fuzzer],
     [])
 
 # Checks for libraries.
-if test "x$with_yaml" == xno; then
+if test "x$with_yaml" = xno; then
   AC_DEFINE([WITHOUT_YAML],[1],[Disable YAML tests])
 else
   AC_CHECK_LIB([yaml], [yaml_parser_initialize])
 fi
 
-AM_CONDITIONAL([WITH_YAML], [test "x$ac_cv_lib_yaml_yaml_parser_initialize" == xyes -a "x$with_yaml" != xno])
+AM_CONDITIONAL([WITH_YAML], [test "x$ac_cv_lib_yaml_yaml_parser_initialize" = xyes -a "x$with_yaml" != xno])
 
 # If libyaml is missing warn or die depending on --with-yaml
 if test x$ac_cv_lib_yaml_yaml_parser_initialize != xyes; then
@@ -65,8 +65,17 @@ AM_CONDITIONAL(USE_COVERAGE, [test x"$with_coverage" = xyes])
 
 # Check for fuzzer 
 AC_MSG_CHECKING([whether to enable fuzzer])
-AS_IF([test "x$with_fuzzer" = "xyes" && test "$CC" = "clang" && test "$CXX" = "clang++"], AC_MSG_RESULT([yes]), AC_MSG_RESULT([no]))
-AM_CONDITIONAL(USE_FUZZER, [test "x$with_fuzzer" = "xyes" && test "$CC" = "clang" && test "$CXX" = "clang++"])
+AS_IF([test "$CC" != "clang" || test "$CXX" != "clang++"], [with_fuzzer=no])
+AS_IF([test "x$with_fuzzer" = "xyes"],
+      [
+        AC_MSG_RESULT([yes])
+        HOST_CPU="`$CC -print-multiarch | sed -e 's/-.*//'`"
+        CFLAGS="$CFLAGS -fsanitize=fuzzer-no-link"
+        LIBFUZZER_NO_MAIN="`$CC $CFLAGS -print-runtime-dir`/libclang_rt.fuzzer_no_main-$HOST_CPU.a -lstdc++ -lm"
+      ],
+      AC_MSG_RESULT([no]))
+AC_SUBST(LIBFUZZER_NO_MAIN)
+AM_CONDITIONAL(USE_FUZZER, [test "x$with_fuzzer" = "xyes"])
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -95,7 +104,7 @@ LIBLOUIS_CURRENT=20
 
 # increment any time the source changes; set to 0 if you increment
 # CURRENT
-LIBLOUIS_REVISION=13
+LIBLOUIS_REVISION=14
 
 # increment if any interfaces have been added; set to 0 if any
 # interfaces have been changed or removed. removal has precedence over
@@ -182,7 +191,7 @@ AC_ARG_ENABLE([macros],
   [enable_macros=$enableval],
   [])
 
-if test "x$enable_macros" == xyes; then
+if test "x$enable_macros" = xyes; then
    AC_DEFINE([ENABLE_MACROS],[1],[Enable macros])
 fi
 AM_CONDITIONAL([ENABLE_MACROS], [test "x$enable_macros" = xyes])
@@ -231,6 +240,7 @@ AC_CONFIG_FILES([
 	liblouis.pc
 	tests/Makefile
 	tests/braille-specs/Makefile
+	tests/fuzzing/Makefile
 	tests/resolve_table.h
 	tests/tables/Makefile
 	tests/tables/emphclass/Makefile

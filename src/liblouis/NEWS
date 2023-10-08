@@ -1,5 +1,124 @@
 liblouis NEWS -- history of user-visible changes.  	-*- org -*-
 
+* Noteworthy changes in release 3.27.0 (2023-09-12)
+This release contains support for two more languages, namely Thai and
+Romanian uncontracted braille. There is also the usual assortment of
+incremental improvements to Bengali, Danish, Hungarian, Swedish, Urdu
+and US English. To top it off, some great new contributors did some
+code cleanups and bug fixes.
+
+I'd like to thank everybody for helping to bring liblouis forward.
+
+For a detailed list of all the changes refer to [[https://github.com/liblouis/liblouis/milestone/37?closed=1][the list of closed
+issues]].
+
+** New features
+- Added support for Thai braille thanks to Chatupol Nootatong, Dr.
+  Wiraman Niyomphol and Itsawat Banlawanich from Thai braille fund and
+  Foundation for the Blind in Thailand.
+- Added a new Romanian 6 dot table, thanks to BAUM Engineering.
+** Braille table improvements
+- Update to Urdu, removing old rule where dots 256 was used for Urdu
+  letters TEH ALEF. Thanks to Jake Kyle.
+- Added the dari character to Bengali thanks to Attila Hammer.
+- Improvements to Hungarian (added more exceptions) thanks to Attila
+  Hammer.
+- Improvements to Hungarian to support users if typing physical
+  braille display, thanks to Attila Hammer.
+- Fixed the translation of Unicode ellipses in US English grade 1 and
+  2 tables thanks to Anthony Tibbs.
+- Added some more symbols to the Nemeth character definitions thanks
+  to Norbert Markus and Attila Hammer.
+- Fixed a bug in Danish when back-translating a word contraction
+  followed by "!", thanks to Bue Vester-Andersen.
+- Improved handling of numbers and fixed a couple of whole-word
+  contraction errors in Swedish braille thanks to Insyn Scandinavia
+  AB.
+- Added the possibility to retain the virtual dots on Dutch braille,
+  so that it should be possible to distinguish between identical dot
+  patterns that originate from different input. Thanks to Bert Frees.
+** Other changes
+- Removed some code smell thanks to Aaron Cannon.
+- Duplicate emphasis class definitions now cause a warning, thanks to
+  Attila Hammer.
+** Deprecation notice
+- None
+** Backwards incompatible changes
+- The line continuation feature was removed, as it was no longer
+  needed and caused problems (e.g. [[https://github.com/liblouis/liblouis/issues/239][issue 239]]). The tables that
+  depended on it were updated. Thanks to Aaron Cannon.
+- Invalid attribute names now cause a table compilation error instead
+  of just a warning. Thanks to Attila Hammer.
+** New, renamed or removed tables
+*** New
+None
+
+*** Renamed
+None
+
+*** Removed
+None
+
+* Noteworthy changes in release 3.26.0 (2023-06-05)
+This release contains one new feature, namely the possibility to mark
+a test as an expected failure just for back- or forward translation.
+On top of that we have updates for Danish, Hungarian, Norwegian and
+Nemeth Braille plus the usual assortment of code cleanups and bug
+fixes.
+
+I'd like to thank everybody for helping to bring liblouis forward.
+
+For a detailed list of all the changes refer to [[https://github.com/liblouis/liblouis/milestone/36?closed=1][the list of closed
+issues]].
+
+** New features
+- The YAML syntax to define tests has been improved so that expected
+  failures can now contain a direction attribute. In other words you
+  can now specify whether you expect a test to fail for both
+  directions or just for forward or backward translation. For more
+  details consult the updated documentation on how to write YAML
+  tests. Thanks to Christian Egli.
+** Bug fixes
+- Fix an out-of-bound write in ~brl_checks.c~ thanks to Bert Frees for
+  the fix and to Han Zheng for the report.
+- Clear the display table cache on ~lou_free~ thanks to Bert Frees for
+  the fix and to David Korczynski for the report.
+** Braille table improvements
+- Improvements to Hungarian (added more exceptions) thanks to Attila
+  Hammer.
+- Changed the Danish grade 2 tables in accordance with updates from
+  the Danish Braille committee, thanks to thanks to Bue
+  Vester-Andersen.
+- Added support for more symbols in the Nemeth braille tables thanks to
+  Norbert Markus.
+- Improvements to Norwegian braille thanks to Lars Bjørndal
+  - Put ~noback~ before acute sign to enable input at sign (email
+    addresses).
+  - Added more ~noback~ prefixes.
+  - Corrected leftwards arrow and added definition for left right arrow.
+  - Changed bullet point from 2356 to 36-36. According to the
+    Norwegian braille standard, this is the preferred unordered list
+    item prefix.
+** Other changes
+- Clarify the ~README~ for Python thanks to Rob Beezer.
+- Properly remove support for Python2 in the Python bindings again
+  thanks to Rob Beezer.
+** Deprecation notice
+- None
+** Backwards incompatible changes
+- None
+** Invisible changes
+- None
+** New, renamed or removed tables
+*** New
+- None
+
+*** Renamed
+- None
+
+*** Removed
+- None
+
 * Noteworthy changes in release 3.25.0 (2023-03-06)
 We dedicate this release to the memory of John Boyer, the original
 author of liblouis. Sadly he passed away recently. We owe him a

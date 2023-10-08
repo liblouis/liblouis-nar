@@ -7,6 +7,7 @@ EXTRA_DIST =					\
 	ba.yaml					\
 	bel.yaml				\
 	bg.yaml					\
+	bn.yaml					\
 	chr-us-g1_harness.yaml			\
 	cop-eg.yaml				\
 	cs_harness.yaml				\
@@ -85,10 +86,10 @@ EXTRA_DIST =					\
 	hu-hu-g1-hyph_harness.yaml		\
 	hu-hu-g1_braille_input_backward.yaml	\
 	hu-hu-g1_braille_input_forward.yaml	\
-	hu-hu-g1-numbers.yaml			\
-	hu-hu-g1_special_consonants.yaml			\
+	hu-hu-g1_dictionary_numbers.yaml			\
+	hu-hu-g1_dictionary_special_consonants.yaml			\
 	hu-hu-g2_harness.yaml			\
-	hu-hu-g2-numbers.yaml			\
+	hu-hu-g2_dictionary_numbers.yaml			\
 	iu-ca-g1_harness.yaml			\
 	ja-kantenji.yaml			\
 	ka.yaml					\
@@ -104,19 +105,17 @@ EXTRA_DIST =					\
 	ml.yaml					\
 	mn-MN_harness.yaml			\
 	ms-my-g2.yaml				\
+	nemeth.yaml				\
 	nl-comp8_harness.yaml			\
 	nl-g0_harness.yaml			\
 	no_8dot_harness.yaml			\
-	no_backward.yaml			\
-	no_g1_harness.yaml			\
-	no_g2_harness.yaml			\
-	no_harness.yaml				\
-	no_typeform_harness.yaml		\
+	no.yaml					\
 	ny-mw.yaml				\
 	pa.yaml					\
 	pl-g1.yaml				\
 	pl-pl-comp8_harness.yaml		\
 	pt-g1.yaml				\
+	ro-g0.yaml				\
 	ru.yaml					\
 	rw-rw-g1.yaml			  	\
 	sah.yaml				\
@@ -129,6 +128,7 @@ EXTRA_DIST =					\
 	sw-ke-dictionary.yaml			\
 	sw-ke.yaml				\
 	ta-ta-g1_harness.yaml			\
+	th.yaml					\
 	tt.yaml					\
 	uk.yaml					\
 	ur-pk-g2.yaml				\
