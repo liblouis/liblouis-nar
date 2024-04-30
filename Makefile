@@ -64,7 +64,8 @@ release :
 	       -DnexusUrl=https://oss.sonatype.org/ \
 	       -DserverId=sonatype-nexus-staging \
 	       -DstagingDescription='$(VERSION)' \
-	       -DkeepStagingRepositoryOnCloseRuleFailure=true
+	       -DkeepStagingRepositoryOnCloseRuleFailure=true \
+	       -DskipStagingRepositoryClose=true
 
 install :
 	$(MVN) nar:nar-prepare-package nar:nar-package jar:jar install:install
