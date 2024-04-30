@@ -1,5 +1,5 @@
 MVN := mvn
-COMPOSE := docker-compose
+COMPOSE := docker compose
 VERSION := $(shell xmllint --xpath "/*/*[local-name()='version']/text()" pom.xml)
 
 TARGET_NAR_LINUX_32   := $(addprefix target/nar/louis-$(VERSION)-i386-Linux-gpp-,executable shared)
