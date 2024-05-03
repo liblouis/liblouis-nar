@@ -27,10 +27,10 @@ clean :
 	$(MVN) clean
 
 $(TARGET_NAR_LINUX_32) :
-	$(COMPOSE) run debian $(MVN) test -Dos.arch=i386
+	$(COMPOSE) run debian mvn test -Dos.arch=i386
 
 $(TARGET_NAR_LINUX_64) :
-	$(COMPOSE) run debian $(MVN) test
+	$(COMPOSE) run debian mvn test
 
 $(TARGET_NAR_MAC_32) :
 	[[ "$$(uname -s)" == Darwin ]]
@@ -47,10 +47,10 @@ $(TARGET_NAR_MAC_ARM64) :
 	   target/nar/louis-$(VERSION)-aarch64-MacOSX-gpp-shared/lib/aarch64-MacOSX-gpp/shared/
 
 $(TARGET_NAR_WIN_32) :
-	$(COMPOSE) run debian $(MVN) test -Pcross-compile -Dhost.os=w64-mingw32 -Dos.arch=i686
+	$(COMPOSE) run debian mvn test -Pcross-compile -Dhost.os=w64-mingw32 -Dos.arch=i686
 
 $(TARGET_NAR_WIN_64) :
-	$(COMPOSE) run debian $(MVN) test -Pcross-compile -Dhost.os=w64-mingw32 -Dos.arch=x86_64
+	$(COMPOSE) run debian mvn test -Pcross-compile -Dhost.os=w64-mingw32 -Dos.arch=x86_64
 
 snapshot :
 	[[ $(VERSION) == *-SNAPSHOT ]]
