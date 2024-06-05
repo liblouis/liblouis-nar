@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.68)
-AC_INIT([Liblouis], [3.26.0], [liblouis-liblouisxml@freelists.org], [liblouis], [http://www.liblouis.io])
+AC_INIT([Liblouis], [3.30.0], [liblouis-liblouisxml@freelists.org], [liblouis], [http://www.liblouis.io])
 AC_CONFIG_SRCDIR([liblouis/lou_backTranslateString.c])
 AM_CONFIG_HEADER(liblouis/config.h)
 
@@ -104,7 +104,7 @@ LIBLOUIS_CURRENT=20
 
 # increment any time the source changes; set to 0 if you increment
 # CURRENT
-LIBLOUIS_REVISION=14
+LIBLOUIS_REVISION=18
 
 # increment if any interfaces have been added; set to 0 if any
 # interfaces have been changed or removed. removal has precedence over
@@ -123,21 +123,6 @@ AC_ISC_POSIX
 AC_HEADER_STDC
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
-
-# catch as many warnings as possible with the help of the gnulib manywarnings module
-gl_MANYWARN_ALL_GCC([warnings])
-# Set up the list of the pointless, undesired warnings.
-nw=
-nw="$nw -Wsystem-headers"       # Don't let system headers trigger warnings
-nw="$nw -Wsuggest-attribute=pure"   # ignore recommendations to use
-nw="$nw -Wsuggest-attribute=format" # attributes, most of these only
-nw="$nw -Wsuggest-attribute=const"  # work in gcc
-nw="$nw -Wsuggest-attribute=noreturn"
-# Enable all GCC warnings not in this list.
-gl_MANYWARN_COMPLEMENT([warnings], [$warnings], [$nw])
-for w in $warnings; do
-  gl_WARN_ADD([$w])
-done
 
 # define an additional recursive make target to format the sources.
 # Also check if clang-format is installed

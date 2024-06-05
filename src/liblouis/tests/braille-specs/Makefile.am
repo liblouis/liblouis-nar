@@ -1,5 +1,7 @@
 EXTRA_DIST =					\
 	afr-za-g2.yaml				\
+	akk.yaml				\
+	akk-borger.yaml				\
 	ar-ar-comp8.yaml			\
 	ar-ar-g1.yaml				\
 	ar-ar-g1_harness.yaml			\
@@ -12,6 +14,7 @@ EXTRA_DIST =					\
 	cop-eg.yaml				\
 	cs_harness.yaml				\
 	cs-comp8_harness.yaml			\
+	cuneiform-transliterated.yaml		\
 	da-dk_1993.yaml				\
 	da-dk-6dot.yaml				\
 	da-dk-8dot.yaml				\
@@ -19,6 +22,7 @@ EXTRA_DIST =					\
 	da-dk-g26-dictionary_harness.yaml	\
 	da-dk-g28-dictionary_harness_1993.yaml	\
 	da-dk-g28-dictionary_harness.yaml	\
+	de-blista-dictionary.yaml 		\
 	de-comp6.yaml				\
 	de-de-comp8.yaml			\
 	de-eurobrl6.yaml			\
@@ -32,21 +36,13 @@ EXTRA_DIST =					\
 	de-g2.yaml				\
 	de-g2-detailed-specs.yaml		\
 	de-g2-dictionary.yaml			\
-	de-g2-blista-dictionary.yaml 		\
 	de-g2-sbs.yaml				\
 	el-backward.yaml			\
 	el-forward.yaml				\
 	en-GB-g2.yaml				\
 	en-gb-g1_harness.yaml			\
 	en-nabcc.yaml				\
-	en-ueb-02-stand_alone.yaml		\
-	en-ueb-03-symbols.yaml			\
-	en-ueb-05-grade_1_mode.yaml		\
-	en-ueb-06-numeric_mode.yaml		\
-	en-ueb-08-capitalization.yaml		\
-	en-ueb-09-typeforms.yaml		\
-	en-ueb-10-07-contractions.yaml		\
-	en-ueb-10-13-contractions.yaml		\
+	en-ueb.yaml				\
 	en-ueb-g1_backward.yaml			\
 	en-ueb-g1_harness.yaml			\
 	en-ueb-g2-dictionary_harness.yaml	\
@@ -54,7 +50,6 @@ EXTRA_DIST =					\
 	en-ueb-g2_backward_no_dis.yaml		\
 	en-ueb-computer-code.yaml		\
 	en-ueb-math.yaml			\
-	en-ueb-repeated-underscores.yaml	\
 	en-ueb-symbols_harness.yaml		\
 	en-us-comp6.yaml			\
 	en-us-emphasis_harness.yaml		\
@@ -69,6 +64,7 @@ EXTRA_DIST =					\
 	fa-ir-comp8-harness.yaml		\
 	fa-ir-g1-harness.yaml			\
 	fi_harness.yaml				\
+	fil.yaml				\
 	fr-bfu-comp6.yaml			\
 	fr-bfu-comp8.yaml			\
 	fr-bfu-g2.yaml				\
@@ -78,6 +74,8 @@ EXTRA_DIST =					\
 	grc-international-common.yaml		\
 	grc-international-composed.yaml		\
 	grc-international-decomposed.yaml	\
+	grc-international-es.yaml	\
+	hbo.yaml				\
 	he-IL.yaml				\
 	hi_harness.yaml				\
 	hr-8dots_harness.yaml			\
@@ -99,6 +97,7 @@ EXTRA_DIST =					\
 	ko-g2_harness.yaml			\
 	litdigits6Dots_backward.yaml		\
 	lg-ug-g1.yaml				\
+	lo.yaml					\
 	lt-6dot_harness.yaml			\
 	lt_harness.yaml				\
 	lv_harness.yaml				\
@@ -122,20 +121,24 @@ EXTRA_DIST =					\
 	sk-g1_harness.yaml			\
 	sl-g1.yaml				\
 	spaces.yaml				\
-	sr-g1_harness.yaml			\
+	sr.yaml					\
 	st-g2.yaml				\
 	sv.yaml					\
 	sw-ke-dictionary.yaml			\
 	sw-ke.yaml				\
+	syc.yaml				\
 	ta-ta-g1_harness.yaml			\
 	th.yaml					\
+	tr.yaml					\
 	tt.yaml					\
+	uga.yaml				\
 	uk.yaml					\
 	ur-pk-g2.yaml				\
 	uz.yaml					\
 	ve-g2.yaml				\
 	vi.yaml					\
 	xh-g2.yaml				\
+	yi.yaml				\
 	zh-chn.yaml				\
 	zh-tw.yaml				\
 	zh-tw-dictionary.yaml				\

@@ -1,7 +1,7 @@
-liblouis 3.26.0 has been released
+liblouis 3.30.0 has been released
 
 The liblouis developer team is proud to announce the liblouis release
-3.26.0. The release is available for download at:
+3.30.0. The release is available for download at:
 
 https://github.com/liblouis/liblouis/releases
 
@@ -18,12 +18,15 @@ liblouisutdml [2]_ deals with formatting of braille.
 Noteworthy changes in this release
 ==================================
 
-This release contains one new feature, namely the possibility to mark a
-test as an expected failure just for back- or forward translation. On
-top of that we have updates for Danish, Hungarian, Norwegian and Nemeth
-Braille plus the usual assortment of code cleanups and bug fixes.
+We are very excited to bring this release as a lot of enthusiasm and
+energy has been gone into it. A lot of of new contributors have improved
+liblouis and added support for new languages to it. We now have support
+for many ancient languages like Akkadian, Ugaritic, Biblical Hebrew or
+Syriac. There is also support for Yiddish now. Also the Dutch tables got
+a very innovative upgrade.
 
-I'd like to thank everybody for helping to bring liblouis forward.
+I'd like to thank all the very dedicated contributors for helping to
+bring liblouis forward.
 
 For a detailed list of all the changes refer to the list of closed
 issues [3]_.
@@ -31,47 +34,63 @@ issues [3]_.
 New features
 ------------
 
--  The YAML syntax to define tests has been improved so that expected
-   failures can now contain a direction attribute. In other words you
-   can now specify whether you expect a test to fail for both directions
-   or just for forward or backward translation. For more details consult
-   the updated documentation on how to write YAML tests. Thanks to
-   Christian Egli.
+-  There is a new uncontracted braille table for Yiddish, created by
+   Abby Howell and Matthew Shifrin, a teacher and student of Yiddish at
+   the Boston Worker's Circle.
+-  A group of incredibly dedicated people has been working on support
+   for ancient languages, namely Matt Yeater and Paul Geoghegan with the
+   help of Sarah Blake LaRose, Eric Harvey, Leonard de Ruijter and Abby
+   Howell. The languages that are supported so far are:
+
+   -  Biblical Hebrew
+   -  Akkadian according to Borger system
+   -  Akkadian braille according to U.S. system
+   -  Syriac
+   -  Ugaritic
+   -  A table to provide support for the languages represented in the
+      Cuneiform / Akkadian Writing systems
 
 Bug fixes
 ---------
 
--  Fix an out-of-bound write in ``brl_checks.c`` thanks to Bert Frees
-   for the fix and to Han Zheng for the report.
--  Clear the display table cache on ``lou_free`` thanks to Bert Frees
-   for the fix and to David Korczynski for the report.
+-  Fix a bug in the Python bindings that occurs on bigendian
+   architectures, thanks to Daniel Garcia.
+-  Fix a memory problem when handling parameters in ``lou_translate``,
+   thanks to benehalo.
 
 Braille table improvements
 --------------------------
 
+-  Minor improvements to the Danish tables thanks to Bue
+   Vester-Andersen:
+
+   -  Fixed a missing contraction for "gjorde".
+
 -  Improvements to Hungarian (added more exceptions) thanks to Attila
    Hammer.
--  Changed the Danish grade 2 tables in accordance with updates from the
-   Danish Braille committee, thanks to thanks to Bue Vester-Andersen.
--  Added support for more symbols in the Nemeth braille tables thanks to
-   Norbert Markus.
--  Improvements to Norwegian braille thanks to Lars Bjørndal
+-  Corrections to the Malay Table thanks to lbk2907.
+-  Major improvements to Serbian backtranslation thanks to Aleksandar
+   Sredojevic:
 
-   -  Put ``noback`` before acute sign to enable input at sign (email
-      addresses).
-   -  Added more ``noback`` prefixes.
-   -  Corrected leftwards arrow and added definition for left right
-      arrow.
-   -  Changed bullet point from 2356 to 36-36. According to the
-      Norwegian braille standard, this is the preferred unordered list
-      item prefix.
+   -  Backtranslation now works to both Cyrillic and Latin script.
+
+-  Fix the metadata for the Cantonese (Hong Kong) table thanks to André
+   Polykanine.
+-  Improvements to backtranslation of Spanish grade 2 thanks to Iván
+   Argote Pérez with the help of Abby Howell.
+-  Major upgrade to the Dutch tables thanks to Bert Frees. These tables
+   use virtual dots in an innovative way to help sighted readers better
+   understand the generated braille. They also use a new technique using
+   ``m4`` macros to simplify writing tables that use many repetitive
+   opcodes.
 
 Other changes
 -------------
 
--  Clarify the ``README`` for Python thanks to Rob Beezer.
--  Properly remove support for Python2 in the Python bindings again
-   thanks to Rob Beezer.
+-  The metadata now has support for ``unicode-range``, i.e. whether the
+   characters used in a table all fall inside the ``0-U+FFFF`` Unicode
+   range (``ucs2``), or whether some characters are in the >
+   ``U+10000-U+10FFFF`` range (``ucs4``), thanks to Bert Frees.
 
 Deprecation notice
 ------------------
@@ -94,22 +113,29 @@ New, renamed or removed tables
 New
 ~~~
 
--  None
+-  ``sr-Cyrl.ctb``
+-  ``yi.utb``
+-  ``hbo.utb``
+-  ``akk.utb``
+-  ``akk-borger.yaml``
+-  ``syc.utb``
+-  ``uga.utb``
+-  ``cuneiform-transliterated.utb``
 
 Renamed
 ~~~~~~~
 
--  None
+None
 
 Removed
 ~~~~~~~
 
--  None
+None
 
 Next release
 ============
 
-The next release will be published on September 4 2023 so please keep up
+The next release will be published on September 2 2024 so please keep up
 the excellent work and keep those improvements coming.
 
 Share and Enjoy!
@@ -126,4 +152,4 @@ Footnotes
    https://github.com/liblouis/liblouisutdml
 
 .. [3]
-   https://github.com/liblouis/liblouis/milestone/36?closed=1
+   https://github.com/liblouis/liblouis/milestone/40?closed=1

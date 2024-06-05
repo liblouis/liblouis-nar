@@ -1,5 +1,5 @@
 # Tests related to contractions and the grade 1 indicator within computer code
-# 
+#
 # Copyright © 2018, 2019 by Michael Robin <robin@chapman.edu>
 #  and 2022 by Krzysztof Drewniak <krzysdrewniak@gmail.com>
 #
@@ -7,7 +7,17 @@
 # are permitted in any medium without royalty provided the copyright
 # notice and this notice are preserved. This file is offered as-is,
 # without any warranty.
-# ----------------------------------------------------------------------------------------------
+#
+# =============================================================================================
+# =============================================================================================
+# WARNING: The tests in this file should be taken with a grain of
+# salt. Many of them are wrong. Some are right however, so deleting
+# the file would not be appropriate. A proper review of the file is
+# needed. Note that all of the issues corresponding to the mailing
+# list references should already have been fixed, see
+# https://github.com/liblouis/liblouis/issues/590).
+# =============================================================================================
+# =============================================================================================
 
 display: text_nabcc.dis
 table:
@@ -101,7 +111,7 @@ tests:
 # https://www.freelists.org/post/liblouis-liblouisxml/FW-Period-vs-dis-conflict-in-UEB-grade-2
 
 - - 'discv'
-  - '4cv'
+  - 'discv'
 # - - 'dish'
 #   - '4h'  -> actual 'di%'
 - - '.cv .h '
@@ -1827,7 +1837,6 @@ tests:
 
 - - ' befs (befs [befs {befs ''befs "befs -befs'
   - ' befs "<befs .<befs _<befs ''befs 8befs -befs'
-  - {xfail: non-contraction of "befs" conflicts witcv contraction of "befores"}
 
 - - ' xl-befores xl-([{''"befores xl/-befores xl$-befores'
   - ' xl-2fs xl-"<.<_<''82fs xl_/-2fs xl`s-2fs'
@@ -1901,7 +1910,6 @@ tests:
 
 - - ' behs (behs [behs {behs ''behs "behs -behs'
   - ' behs "<behs .<behs _<behs ''behs 8behs -behs'
-  - {xfail: non-contraction of "behs" conflicts witcv contraction of "behinds"}
 
 - - ' xl-behinds xl-([{''"behinds xl/-behinds xl$-behinds'
   - ' xl-2hs xl-"<.<_<''82hs xl_/-2hs xl`s-2hs'
@@ -1919,7 +1927,6 @@ tests:
 
 - - ' behs) behs] behs} behs'' behs" behs- behs, behs. behs; behs: behs? behs! behs@ behs# behs$ behs% behs^ behs& behs* behs( behs_ behs= behs+ behs[ behs{ behs\\ behs| behs< behs> behs` behs~ behs/'
   - ' behs"> behs.> behs_> behs'' behs0 behs- behs1 behs4 behs2 behs3 behs8 behs6 behs`a behs_? behs`s behs.0 behs`5 behs`& behs"9 behs"< behs.- behs"7 behs"6 behs.< behs_< behs_* behs_| behs`< behs`> behs.* behs`9 behs_/'
-  - {xfail: non-contraction of "behs" conflicts with contraction of "behinds"}
 
 - - ' behinds-xl behinds-([{''"xl behinds-/xl behinds-$xl'
   - ' 2hs-xl 2hs-"<.<_<''8xl 2hs-_/xl 2hs-`sxl'
