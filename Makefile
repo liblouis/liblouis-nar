@@ -1,5 +1,5 @@
 MVN := mvn
-COMPOSE := docker compose
+DOCKER := docker
 VERSION := $(shell xmllint --xpath "/*/*[local-name()='version']/text()" pom.xml)
 
 TARGET_NAR_LINUX_32   := $(addprefix target/nar/louis-$(VERSION)-i386-Linux-gpp-,executable shared)
@@ -10,6 +10,7 @@ TARGET_NAR_MAC_ARM64  := $(addprefix target/nar/louis-$(VERSION)-aarch64-MacOSX-
 TARGET_NAR_WIN_32     := $(addprefix target/nar/louis-$(VERSION)-i686-w64-mingw32-gpp-,executable shared)
 TARGET_NAR_WIN_64     := $(addprefix target/nar/louis-$(VERSION)-x86_64-w64-mingw32-gpp-,executable shared)
 
+.PHONY : all
 all : compile-linux compile-windows
 compile-linux : $(TARGET_NAR_LINUX_32) $(TARGET_NAR_LINUX_64)
 compile-windows : $(TARGET_NAR_WIN_32) $(TARGET_NAR_WIN_64)
@@ -23,14 +24,39 @@ compile-macosx : $(TARGET_NAR_MAC_ARM64)
 endif
 endif
 
+.PHONY : clean
 clean :
 	$(MVN) clean
 
-$(TARGET_NAR_LINUX_32) :
-	$(COMPOSE) run debian mvn test -Dos.arch=i386
+DOCKER_IMAGE := liblouis-nar_debian
 
-$(TARGET_NAR_LINUX_64) :
-	$(COMPOSE) run debian mvn test
+.PHONY : docker-image
+docker-image :
+	if ! $(DOCKER) images | grep $(DOCKER_IMAGE); then \
+		$(DOCKER) buildx create --use --name=mybuilder \
+		                        --driver docker-container \
+		                        --driver-opt image=moby/buildkit:buildx-stable-1 && \
+		$(DOCKER) buildx build --platform linux/amd64 \
+		                       -t $(DOCKER_IMAGE) \
+		                       --load \
+		                       Dockerfile; \
+		$(DOCKER) buildx rm mybuilder; \
+	fi
+
+mvn-on-linux-amd64 = $(MAKE) docker-image && \
+	$(DOCKER) run --platform linux/amd64 \
+	              --rm \
+	              -v "$(CURDIR):/root/src" \
+	              -v "$(CURDIR)/.m2/repository:/root/.m2/repository" \
+	              -w "/root/src" \
+	              -it $(DOCKER_IMAGE) \
+	              mvn $1
+
+$(TARGET_NAR_LINUX_32) :
+	$(call mvn-on-linux-amd64, test -Dos.arch=i386)
+
+$(TARGET_NAR_LINUX_X64) :
+	$(call mvn-on-linux-amd64, test)
 
 $(TARGET_NAR_MAC_32) :
 	[[ "$$(uname -s)" == Darwin ]]
@@ -47,10 +73,10 @@ $(TARGET_NAR_MAC_ARM64) :
 	   target/nar/louis-$(VERSION)-aarch64-MacOSX-gpp-shared/lib/aarch64-MacOSX-gpp/shared/
 
 $(TARGET_NAR_WIN_32) :
-	$(COMPOSE) run debian mvn test -Pcross-compile -Dhost.os=w64-mingw32 -Dos.arch=i686
+	$(call mvn-on-linux-amd64, test -Pcross-compile -Dhost.os=w64-mingw32 -Dos.arch=i686)
 
 $(TARGET_NAR_WIN_64) :
-	$(COMPOSE) run debian mvn test -Pcross-compile -Dhost.os=w64-mingw32 -Dos.arch=x86_64
+	$(call mvn-on-linux-amd64, test -Pcross-compile -Dhost.os=w64-mingw32 -Dos.arch=x86_64)
 
 snapshot :
 	[[ $(VERSION) == *-SNAPSHOT ]]
