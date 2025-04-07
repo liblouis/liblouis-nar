@@ -11,7 +11,8 @@ EXTRA_DIST =					\
 	bg.yaml					\
 	bn.yaml					\
 	chr-us-g1_harness.yaml			\
-	cop-eg.yaml				\
+	cop.yaml				\
+	critical-apparatus.yaml		\
 	cs_harness.yaml				\
 	cs-comp8_harness.yaml			\
 	cuneiform-transliterated.yaml		\
@@ -58,7 +59,7 @@ EXTRA_DIST =					\
 	en-us-g2.yaml				\
 	en-us-g2-dictionary_harness.yaml	\
 	eo-g1_harness.yaml			\
-	es-comp.yaml				\
+	es-g0-g1.yaml				\
 	es-g2.yaml				\
 	ethio-g1_harness.yaml			\
 	fa-ir-comp8-harness.yaml		\
@@ -88,6 +89,7 @@ EXTRA_DIST =					\
 	hu-hu-g1_dictionary_special_consonants.yaml			\
 	hu-hu-g2_harness.yaml			\
 	hu-hu-g2_dictionary_numbers.yaml			\
+	ipa.yaml				\
 	iu-ca-g1_harness.yaml			\
 	ja-kantenji.yaml			\
 	ka.yaml					\
@@ -104,16 +106,16 @@ EXTRA_DIST =					\
 	ml.yaml					\
 	mn-MN_harness.yaml			\
 	ms-my-g2.yaml				\
+	my-g2.yaml				\
 	nemeth.yaml				\
 	nl-comp8_harness.yaml			\
 	nl-g0_harness.yaml			\
-	no_8dot_harness.yaml			\
 	no.yaml					\
 	ny-mw.yaml				\
 	pa.yaml					\
 	pl-g1.yaml				\
 	pl-pl-comp8_harness.yaml		\
-	pt-g1.yaml				\
+	pt.yaml				\
 	ro-g0.yaml				\
 	ru.yaml					\
 	rw-rw-g1.yaml			  	\
@@ -129,6 +131,7 @@ EXTRA_DIST =					\
 	syc.yaml				\
 	ta-ta-g1_harness.yaml			\
 	th.yaml					\
+	th-g1.yaml					\
 	tr.yaml					\
 	tt.yaml					\
 	uga.yaml				\

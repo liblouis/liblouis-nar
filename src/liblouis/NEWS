@@ -1,12 +1,220 @@
 liblouis NEWS -- history of user-visible changes.  	-*- org -*-
 
+* Noteworthy changes in release 3.33.0 (2025-03-03)
+This release combines braille improvements with security enhancements.
+We have new tables for Coptic braille, Cuneiform transliteration and
+for Portuguese 6-dot computer braille. There are improvements to
+Dutch, Hungarian, the International Phonetic Alphabet, Norwegian and
+UEB. On the security side a lot of people have reported and fixed
+buffer overflows and other memory issues.
+
+I'd like to thank everybody for helping to bring liblouis forward.
+
+For a detailed list of all the changes refer to [[https://github.com/liblouis/liblouis/milestone/43?closed=1][the list of closed
+issues]].
+
+** New features
+- None
+** Bug fixes
+- A large number of buffer overflow problems have been solved:
+  - Fix free error in ~parseQuery~ and ~analyzeTable~ thanks to Liu
+    Yuwei
+  - Fix an overflow in ~passDoAction~ and ~doPassSearch~ thanks to Liu
+    Yuwei
+  - Fixed a segfault in ~finalizeCharacter~ thanks to Christian Egli
+    and cx104906.
+  - Fix a heap-buffer-overflow error in ~compileRule~ and
+    ~_lou_extParseChars~ thanks to tyler92.
+  - Fix a heap buffer overflow in ~back_passDoAction~ thanks to Bert
+    Frees and Liu Yuwei.
+- A doc string has been added to ~lou_translateString~ and
+  ~lou_translate~ outlining the buffer overflow risk thanks to
+  Christian Egli and shuangxiangkan.
+- Fix the default table search path on Windows thanks to Bert Frees
+  and Bue Vester-Andersen
+** Braille table improvements
+- Fix the back-translation of capital sign in Dutch thanks to Bert Frees
+- Major improvements to Norwegian thanks to Lars Bjørndal
+- Improvements to the UEB table thanks to James Bowden. In particular
+  the handling of words containing "somer", e.g. "Somerville" was
+  fixed.
+- Hungarian improvements (added more exceptions) thanks to Attila
+  Hammer.
+- Add a new 6-dot table for literary Coptic braille, thanks to Eric
+  Harvey.
+- Added some missing symbols (including space) to the table for the
+  International Phonetic Alphabet, thanks to Robert Englebretson and
+  James Bowden.
+- Add a table for Portuguese 6-dot computer braille, thanks to Tiago
+  M. Casal and Iván Argote-Pérez. The table is based on the official
+  [[https://www.gov.br/mec/pt-br/media/publicacoes/semesp/grafiainfo.pdf][documentation in Portuguese]].
+- Add a new table for Cuneiform transliteration. It differs from the
+  existing table ~cuneiform-transliterated.utb~ in that it does not
+  adopt UEB dot patterns for the various diacritic marks. Instead it
+  uses bespoke diacritics inspired by some IPA symbols. Thanks to Eric
+  Harvey.
+** Other changes
+- None
+** Deprecation notice
+- None
+** Backwards incompatible changes
+- Make value in table metadata field mandatory: It makes the metadata
+  system clearer and simpler. Empty values have not been used anyway.
+** Invisible changes
+** New, renamed or removed tables
+*** New
+- ~cop.utb~
+- ~cuneiform-transliterated-compact.utb~
+- ~pt-comp6.utb~
+
+*** Renamed
+- None
+
+*** Removed
+- None
+
+* Noteworthy changes in release 3.32.0 (2024-12-02)
+A lot of intense work by Matt, Paul, Leonard, Eric, Sarah and Bert
+went into this release. There are new tables for Biblical Language and
+Ancient Near Eastern Studies. We have improvements for UEB, Spanish,
+Turkish and Hungarian. There are also a couple of new features, for
+example the handling of the language metadata has been extended to
+handle language ranges.
+
+I'd like to thank all the very dedicated contributors for helping to
+push liblouis forward.
+
+For a detailed list of all the changes refer to [[https://github.com/liblouis/liblouis/milestone/42?closed=1][the list of closed
+issues]].
+
+** New features
+- ~lou_translate~ now has an option to specify a display table. This
+  is especially useful when using a query. Before it would just
+  default to a Unicode display table, thanks to Christian Egli.
+- Meta data for ~language~ and ~region~ can now be specified using a
+  [[https://datatracker.ietf.org/doc/html/rfc4647#section-2.2][IETF Extended Language Range]]. This is particularly useful for
+  accessing tables related to a specific region, for instance. Thanks
+  to Bert Frees.
+
+** Bug fixes
+- Fix a memory problem in the ~getTable~ function. Thanks to the
+  oss-fuzz project for reporting and to Christian Egli for fixing it.
+- Fix a build problem on Windows related to ~strncasecmp~ which was
+  reported at the last minute by Leonard de Ruijter and fixed by
+  Christian Egli.
+
+** Braille table improvements
+- Updates to Spanish grade 1 thanks to José Manuel Delicado:
+  - Removed lowered digits. This allows certain punctuation to be written again.
+  - Included ~digits6Dots.uti~. This prevents the numsign from disappearing.
+  - The symbols =.= and =,= are used as numeric mode chars.
+  - Added the ~noback~ operator to the apostrophe symbol, since it's
+    not very used and conflicts with the =.=.
+- Extensive fixes to the UEB computer code thanks to James Bowden.
+- Improvements to Turkish grade 2 thanks to Oğuz Uğur and Attila
+  Hammer.
+- Hungarian improvements (added more exceptions) thanks to Attila
+  Hammer.
+- There is now an include table for symbols referencing the critical
+  apparatus in critical texts thanks to Matt Yeater.
+
+** Other changes
+- Migrate to ~realloc-posix~ from gnulib, as ~realloc-gnu~ that we
+  used before is now deprecated. Thanks to Christian Egli.
+- Improvements to the manual thanks to Huan Wu.
+- Thanks to Rob Beezer we now have instructions on how to install
+  Python bindings in a virtual environment.
+
+** Deprecation notice
+- None
+
+** Backwards incompatible changes
+- If liblouis has been compiled for 16-bit Unicode it will now error
+  if a table contains characters outside of that range. Previously it
+  would issue a warning and ignore the problem. Thanks to Christian
+  Egli.
+
+** Invisible changes
+- None
+
+** New, renamed or removed tables
+*** New
+- ~critical-apparatus.uti~
+- ~he-common-consonants.uti~
+- ~he-common-vowels-ihbc.uti~
+
+*** Renamed
+- None
+
+*** Removed
+- None
+
+* Noteworthy changes in release 3.31.0 (2024-09-02)
+This release adds support for new braille tables, such as Thai
+contracted and Greek International US, and updates existing braille
+tables such as the Finnish table which has been updated to the latest
+braille standard. Benehalo has uncovered a number of security problems
+in the liblouis code and has thankfully also provided fixes for them
+by hardening the code.
+
+I'd like to thank all the very dedicated contributors for helping to
+push liblouis forward.
+
+For a detailed list of all the changes refer to [[https://github.com/liblouis/liblouis/milestone/41?closed=1][the list of closed
+issues]].
+
+** New features
+- None
+** Bug fixes
+- Benehalo discovered quite a number of security problems and kindly
+  enough also just fixed them by adding some check guards and making
+  the code more robust.
+** Braille table improvements
+- Hungarian improvements (added more exceptions) thanks to Attila
+  Hammer.
+- The usage of ~match~ opcodes with empty pre- and post patterns, e.g.
+  ~match - disk - 145-24-16~ in some tables has been replaced with
+  plain old ~always~ opcodes, as their implementation is much faster.
+- A change to the Spanish back-translation that went into the last
+  release was reverted as it caused more problems than it solved.
+- The Dutch display table has been improved thanks to Bert Frees.
+- The Finnish table has been updated to reflect the latest Finnish
+  braille standard from 2021 (Pistekirjoituksen perusteet, 2021)
+  thanks to Sami Maatta from Celia.
+- Added a new Thai contracted braille table according to the
+  guidelines of "Thai Braille Use Manual" of the National Braille
+  Promotion and Development Fund. Thanks to Chatupol Nootatong.
+- Add a table for Greek International US braille. This table is based
+  on the composed Greek characters, unlike the existing English
+  table which is based on the decomposed system. Thanks to Sarah Blake
+  LaRose and Leonard de Ruijter.
+
+** Other changes
+- None
+** Deprecation notice
+- None
+** Backwards incompatible changes
+- None
+** Invisible changes
+- None
+** New, renamed or removed tables
+*** New
+- ~th-g1.utb~
+- ~grc-international-en-composed.utb~
+
+*** Renamed
+None
+
+*** Removed
+None
+
 * Noteworthy changes in release 3.30.0 (2024-06-03)
-We are very excited to bring this release as a lot of enthusiasm and
-energy has been gone into it. A lot of of new contributors have
-improved liblouis and added support for new languages to it. We now
-have support for many ancient languages like Akkadian, Ugaritic,
-Biblical Hebrew or Syriac. There is also support for Yiddish now. Also
-the Dutch tables got a very innovative upgrade.
+We are very excited to present this release, as a lot of enthusiasm
+and energy have gone into it. A host of of new contributors have
+improved liblouis and added support for new languages. We now have
+support for many ancient languages, like Akkadian, Ugaritic, Biblical
+Hebrew and Syriac. This release also supports Yiddish. And the Dutch
+tables got a very innovative upgrade.
 
 I'd like to thank all the very dedicated contributors for helping to
 bring liblouis forward.
@@ -69,7 +277,7 @@ issues]].
 - ~yi.utb~
 - ~hbo.utb~
 - ~akk.utb~
-- ~akk-borger.yaml~
+- ~akk-borger.utb~
 - ~syc.utb~
 - ~uga.utb~
 - ~cuneiform-transliterated.utb~

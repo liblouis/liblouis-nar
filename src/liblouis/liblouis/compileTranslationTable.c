@@ -29,6 +29,8 @@
  * @brief Read and compile translation tables
  */
 
+#include <config.h>
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,7 +40,6 @@
 #include <sys/stat.h>
 
 #include "internal.h"
-#include "config.h"
 
 #define QUOTESUB 28 /* Stand-in for double quotes in strings */
 
@@ -625,6 +626,7 @@ putDots(const FileInfo *file, widechar d, TranslationTableHeader **table, int ru
 
 static CharDotsMapping *
 getDotsForChar(widechar c, const DisplayTableHeader *table) {
+	if (table == NULL) return NULL;
 	CharDotsMapping *cdPtr;
 	const TranslationTableOffset bucket = table->charToDots[_lou_charHash(c)];
 	TranslationTableOffset offset = bucket;
@@ -638,6 +640,7 @@ getDotsForChar(widechar c, const DisplayTableHeader *table) {
 
 static CharDotsMapping *
 getCharForDots(widechar d, const DisplayTableHeader *table) {
+	if (table == NULL) return NULL;
 	CharDotsMapping *cdPtr;
 	const TranslationTableOffset bucket = table->dotsToChar[_lou_charHash(d)];
 	TranslationTableOffset offset = bucket;
@@ -1347,14 +1350,15 @@ parseChars(const FileInfo *file, CharsString *result, CharsString *token) {
 					break;
 				default:
 					compileError(file, "invalid escape sequence '\\%c'", ch);
-					break;
+					result->length = lastOutSize;
+					return 0;
 				}
 				in++;
 			}
 			if (out >= MAXSTRING - 1) {
 				compileError(file, "Token too long");
 				result->length = MAXSTRING - 1;
-				return 1;
+				return 0;
 			}
 			result->chars[out++] = (widechar)ch;
 			continue;
@@ -1369,7 +1373,7 @@ parseChars(const FileInfo *file, CharsString *result, CharsString *token) {
 			if (out >= MAXSTRING - 1) {
 				compileError(file, "Token too long");
 				result->length = lastOutSize;
-				return 1;
+				return 0;
 			}
 			if (token->chars[in] < 128 || (token->chars[in] & 0x0040)) {
 				compileWarning(file, "invalid UTF-8. Assuming Latin-1.");
@@ -1382,9 +1386,13 @@ parseChars(const FileInfo *file, CharsString *result, CharsString *token) {
 		if (out >= MAXSTRING - 1) {
 			compileError(file, "Token too long");
 			result->length = lastOutSize;
-			return 1;
+			return 0;
 		}
-		if (CHARSIZE == 2 && utf32 > 0xffff) utf32 = 0xffff;
+		if (CHARSIZE == 2 && utf32 > 0xffff) {
+			compileError(file, "liblouis has not been compiled for 32-bit Unicode");
+			result->length = lastOutSize;
+			return 0;
+		}
 		result->chars[out++] = (widechar)utf32;
 	}
 	result->length = out;
@@ -1400,11 +1408,7 @@ _lou_extParseChars(const char *inString, widechar *outString) {
 	for (k = 0; inString[k] && k < MAXSTRING - 1; k++) wideIn.chars[k] = inString[k];
 	wideIn.chars[k] = 0;
 	wideIn.length = k;
-	parseChars(NULL, &result, &wideIn);
-	if (errorCount) {
-		errorCount = 0;
-		return 0;
-	}
+	if (!parseChars(NULL, &result, &wideIn)) return 0;
 	for (k = 0; k < result.length; k++) outString[k] = result.chars[k];
 	return result.length;
 }
@@ -4380,6 +4384,7 @@ finalizeCharacter(TranslationTableHeader *table, TranslationTableOffset characte
 			// compute basechar recursively
 			basecharOffset = basechar->basechar;
 			basechar = finalizeCharacter(table, basecharOffset, detect_loop);
+			if (!basechar) return NULL;
 			if (character->mode & (basechar->attributes | basechar->mode)) {
 				char *attributeName = NULL;
 				const CharacterClass *class = table->characterClasses;
@@ -4566,7 +4571,7 @@ compileString(const char *inString, TranslationTableHeader **table,
 	file.lineNumber = 1;
 	file.status = 0;
 	file.linepos = 0;
-	for (k = 0; inString[k]; k++) file.line[k] = inString[k];
+	for (k = 0; k < MAXSTRING - 1 && inString[k]; k++) file.line[k] = inString[k];
 	file.line[k] = 0;
 	file.linelen = k;
 	if (table && *table && (*table)->finalized) {
@@ -4718,7 +4723,18 @@ _lou_getTablePath(void) {
 		path = lou_getProgramPath();
 		if (path != NULL) {
 			if (path[0] != '\0')
-				cp += sprintf(cp, ",%s%s", path, "\\share\\liblouis\\tables");
+				// assuming the following directory structure:
+				// .
+				// ├── bin
+				// │   ├── liblouis.dll
+				// ├── include
+				// ├── lib
+				// └── share
+				//     ├── doc
+				//     ├── info
+				//     └── liblouis
+				//         └── tables
+				cp += sprintf(cp, ",%s%s", path, "\\..\\share\\liblouis\\tables");
 			free(path);
 		}
 #else
@@ -4738,7 +4754,7 @@ _lou_getTablePath(void) {
  * `LOUIS_TABLEPATH`, `dataPath` and `programPath` (in that order).
  *
  * @param table A file path, may be absolute or relative. May be a list of
- *              tables separated by comma's. In that case, the first table
+ *              tables separated by commas. In that case, the first table
  *              is used as the base for the other subtables.
  * @param base A file path or directory path, or NULL.
  * @return The file paths of the resolved subtables, or NULL if the table
@@ -4968,11 +4984,11 @@ compileTable(const char *tableList, const char *displayTableList,
 		(*translationTable)->ruleNames = NULL;
 	}
 
-	/* Compile things that are necesary for the proper operation of
+	/* Compile things that are necessary for the proper operation of
 	 * liblouis or liblouisxml or liblouisutdml */
 	/* TODO: These definitions seem to be necessary for proper functioning of
 	   liblouisutdml. Find a way to satisfy those requirements without hard coding
-	   some characters in every table notably behind the users back */
+	   some characters in every table notably behind the user's back */
 	compileString("space \\xffff 123456789abcdef LOU_ENDSEGMENT", translationTable,
 			displayTable);
 
@@ -5065,8 +5081,8 @@ void EXPORT_CALL
 _lou_getTable(const char *tableList, const char *displayTableList,
 		const TranslationTableHeader **translationTable,
 		const DisplayTableHeader **displayTable) {
-	TranslationTableHeader *newTable;
-	DisplayTableHeader *newDisplayTable;
+	TranslationTableHeader *newTable = NULL;
+	DisplayTableHeader *newDisplayTable = NULL;
 	getTable(tableList, displayTableList, &newTable, &newDisplayTable);
 	if (newTable)
 		if (!finalizeTable(newTable)) newTable = NULL;
@@ -5077,8 +5093,8 @@ _lou_getTable(const char *tableList, const char *displayTableList,
 /* Checks and loads tableList. */
 const void *EXPORT_CALL
 lou_getTable(const char *tableList) {
-	const TranslationTableHeader *table;
-	const DisplayTableHeader *displayTable;
+	const TranslationTableHeader *table = NULL;
+	const DisplayTableHeader *displayTable = NULL;
 	_lou_getTable(tableList, tableList, &table, &displayTable);
 	if (!table || !displayTable) return NULL;
 	return table;
@@ -5086,7 +5102,7 @@ lou_getTable(const char *tableList) {
 
 const TranslationTableHeader *EXPORT_CALL
 _lou_getTranslationTable(const char *tableList) {
-	TranslationTableHeader *table;
+	TranslationTableHeader *table = NULL;
 	getTable(tableList, NULL, &table, NULL);
 	if (table)
 		if (!finalizeTable(table)) table = NULL;
@@ -5095,7 +5111,7 @@ _lou_getTranslationTable(const char *tableList) {
 
 const DisplayTableHeader *EXPORT_CALL
 _lou_getDisplayTable(const char *tableList) {
-	DisplayTableHeader *table;
+	DisplayTableHeader *table = NULL;
 	getTable(NULL, tableList, NULL, &table);
 	return table;
 }
