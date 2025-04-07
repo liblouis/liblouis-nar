@@ -312,6 +312,12 @@
 			</build>
 		</profile>
 		<profile>
+			<id>macos-universal-binary</id>
+			<properties>
+				<nar.host.option>--enable-macos-universal-binary</nar.host.option>
+			</properties>
+		</profile>
+		<profile>
 			<id>sonatype-deploy</id>
 			<build>
 				<plugins>

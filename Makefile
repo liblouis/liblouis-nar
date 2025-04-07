@@ -81,7 +81,7 @@ $(TARGET_NAR_MAC_X64) :
 
 $(TARGET_NAR_MAC_ARM64) :
 	[[ "$$(uname)" == Darwin && "$$(uname -m)" == arm64 ]]
-	$(MVN) test
+	$(MVN) test -Pmacos-universal-binary
 
 $(TARGET_NAR_WIN_32) :
 	$(call mvn-on-linux, amd64, test -Pcross-compile -Dhost.os=w64-mingw32 -Dos.arch=i686)
