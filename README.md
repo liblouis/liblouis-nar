@@ -11,7 +11,6 @@ tag and push.
 To build for all platforms at once on your local machine:
 
 ``` console
-$ docker-compose build debian
 $ make clean all
 ```
 

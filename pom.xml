@@ -176,6 +176,7 @@
 									<directory>target/nar/gnu/${nar.aol}/target/lib</directory>
 									<includes>
 										<include>*.dll.a</include>
+										<include>liblouis.dylib</include>
 										<include>pkgconfig/*</include>
 									</includes>
 								</resource>
