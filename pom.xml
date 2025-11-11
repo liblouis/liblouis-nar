@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.liblouis</groupId>
 	<artifactId>louis</artifactId>
-	<version>3.33.0-p1</version>
+	<version>3.33.0-p2-SNAPSHOT</version>
 	<packaging>nar</packaging>
 	<name>liblouis-nar</name>
 	<description>liblouis packaged in a NAR (Native ARchive).</description>
@@ -177,6 +177,7 @@
 									<includes>
 										<include>*.dll.a</include>
 										<include>liblouis.dylib</include>
+										<include>liblouis.so</include>
 										<include>pkgconfig/*</include>
 									</includes>
 								</resource>
