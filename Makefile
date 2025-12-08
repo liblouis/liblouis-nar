@@ -96,13 +96,9 @@ snapshot :
 release :
 	[[ $(VERSION) != *-SNAPSHOT ]]
 	$(MVN) nar:nar-prepare-package nar:nar-package jar:jar gpg:sign install:install \
-	       org.sonatype.plugins:nexus-staging-maven-plugin:1.6.8:deploy \
+	       org.sonatype.central:central-publishing-maven-plugin:0.8.0:publish \
 	       -Psonatype-deploy \
-	       -DnexusUrl=https://oss.sonatype.org/ \
-	       -DserverId=sonatype-nexus-staging \
-	       -DstagingDescription='$(VERSION)' \
-	       -DkeepStagingRepositoryOnCloseRuleFailure=true \
-	       -DskipStagingRepositoryClose=true
+	       -DpublishingServerId=central
 
 install :
 	$(MVN) nar:nar-prepare-package nar:nar-package jar:jar install:install
