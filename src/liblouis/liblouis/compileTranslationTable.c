@@ -29,7 +29,7 @@
  * @brief Read and compile translation tables
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -281,9 +281,6 @@ static short opcodeLengths[CTO_None] = { 0 };
 
 static void
 compileError(const FileInfo *file, const char *format, ...);
-
-static void
-free_tablefiles(char **tables);
 
 static int
 getAChar(FileInfo *file) {
@@ -1272,20 +1269,23 @@ hexValue(const FileInfo *file, const widechar *digits, int length) {
 static const unsigned int first0Bit[MAXBYTES] = { 0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC,
 	0XFE };
 
+static bool
+isMatchPatternEscape(unsigned int ch, bool inMatchPattern) {
+	return inMatchPattern && (ch == '(' || ch == ')' || ch == ']');
+}
+
 static int
-parseChars(const FileInfo *file, CharsString *result, CharsString *token) {
+parseCharsInternal(const FileInfo *file, CharsString *result, CharsString *token,
+		bool inMatchPattern) {
 	int in = 0;
 	int out = 0;
 	int lastOutSize = 0;
-	int lastIn;
-	unsigned int ch = 0;
-	int numBytes = 0;
-	unsigned int utf32 = 0;
-	int k;
 	while (in < token->length) {
-		ch = token->chars[in++] & 0xff;
+		unsigned int ch = token->chars[in++] & 0xff;
 		if (ch < 128) {
-			if (ch == '\\') { /* escape sequence */
+			if (ch == '\\' &&
+					!isMatchPatternEscape(
+							token->chars[in], inMatchPattern)) { /* escape sequence */
 				switch (ch = token->chars[in]) {
 				case '\\':
 					break;
@@ -1364,11 +1364,12 @@ parseChars(const FileInfo *file, CharsString *result, CharsString *token) {
 			continue;
 		}
 		lastOutSize = out;
-		lastIn = in;
+		int lastIn = in;
+		int numBytes = 0;
 		for (numBytes = MAXBYTES - 1; numBytes > 0; numBytes--)
 			if (ch >= first0Bit[numBytes]) break;
-		utf32 = ch & (0XFF - first0Bit[numBytes]);
-		for (k = 0; k < numBytes; k++) {
+		unsigned int utf32 = ch & (0XFF - first0Bit[numBytes]);
+		for (int k = 0; k < numBytes; k++) {
 			if (in >= MAXSTRING - 1 || in >= token->length) break;
 			if (out >= MAXSTRING - 1) {
 				compileError(file, "Token too long");
@@ -1397,6 +1398,16 @@ parseChars(const FileInfo *file, CharsString *result, CharsString *token) {
 	}
 	result->length = out;
 	return 1;
+}
+
+static int
+parseChars(const FileInfo *file, CharsString *result, CharsString *token) {
+	return parseCharsInternal(file, result, token, false);
+}
+
+static int
+parseMatchPatternChars(const FileInfo *file, CharsString *result, CharsString *token) {
+	return parseCharsInternal(file, result, token, true);
 }
 
 int EXPORT_CALL
@@ -1539,6 +1550,14 @@ getCharacters(FileInfo *file, CharsString *characters) {
 	CharsString token;
 	if (!getToken(file, &token, "characters")) return 0;
 	return parseChars(file, characters, &token);
+}
+
+static int
+getMatchPatternCharacters(FileInfo *file, CharsString *characters) {
+	/* Get match pattern string */
+	CharsString token;
+	if (!getToken(file, &token, "characters")) return 0;
+	return parseMatchPatternChars(file, characters, &token);
 }
 
 static int
@@ -3093,9 +3112,9 @@ doOpcode:
 			if (!patterns) _lou_outOfMemory();
 			memset(patterns, 0xffff, patternsByteSize);
 			noback = 1;
-			getCharacters(file, &ptn_before);
+			getMatchPatternCharacters(file, &ptn_before);
 			getRuleCharsText(file, &ruleChars);
-			getCharacters(file, &ptn_after);
+			getMatchPatternCharacters(file, &ptn_after);
 			getRuleDotsPattern(file, &ruleDots);
 			if (!addRule(file, opcode, &ruleChars, &ruleDots, after, before, &ruleOffset,
 						&rule, noback, nofor, table))
@@ -3144,9 +3163,9 @@ doOpcode:
 			if (!patterns) _lou_outOfMemory();
 			memset(patterns, 0xffff, patternsByteSize);
 			nofor = 1;
-			getCharacters(file, &ptn_before);
+			getMatchPatternCharacters(file, &ptn_before);
 			getRuleCharsText(file, &ruleChars);
-			getCharacters(file, &ptn_after);
+			getMatchPatternCharacters(file, &ptn_after);
 			getRuleDotsPattern(file, &ruleDots);
 			if (!addRule(file, opcode, &ruleChars, &ruleDots, 0, 0, &ruleOffset, &rule,
 						noback, nofor, table))
@@ -4797,7 +4816,7 @@ _lou_defaultTableResolver(const char *tableList, const char *base) {
 				_lou_logMessage(LOU_LOG_ERROR, "LOUIS_TABLEPATH=%s", path);
 			free(searchPath);
 			free(tableList_copy);
-			free_tablefiles(tableFiles);
+			lou_freeTableFiles(tableFiles);
 			return NULL;
 		}
 		if (k == 1) base = subTable;
@@ -4832,7 +4851,7 @@ char **EXPORT_CALL
 _lou_resolveTable(const char *tableList, const char *base) {
 	char **tableFiles = (*tableResolver)(tableList, base);
 	char **result = copyStringArray(tableFiles);
-	if (tableResolver == &_lou_defaultTableResolver) free_tablefiles(tableFiles);
+	if (tableResolver == &_lou_defaultTableResolver) lou_freeTableFiles(tableFiles);
 	return result;
 }
 
@@ -4910,11 +4929,10 @@ freeDisplayTable(DisplayTableHeader *t) {
 /**
  * Free a char** array
  */
-static void
-free_tablefiles(char **tables) {
-	char **table;
+void EXPORT_CALL
+lou_freeTableFiles(char **tables) {
 	if (!tables) return;
-	for (table = tables; *table; table++) free(*table);
+	for (char **table = tables; *table; table++) free(*table);
 	free(tables);
 }
 
@@ -4942,13 +4960,13 @@ includeFile(const FileInfo *file, CharsString *includedFile,
 		return 0;
 	}
 	if (tableFiles[1] != NULL) {
-		free_tablefiles(tableFiles);
+		lou_freeTableFiles(tableFiles);
 		compileError(file, "Table list not supported in include statement: 'include %s'",
 				includeThis);
 		return 0;
 	}
 	rv = compileFile(*tableFiles, table, displayTable);
-	free_tablefiles(tableFiles);
+	lou_freeTableFiles(tableFiles);
 	if (!rv)
 		_lou_logMessage(LOU_LOG_ERROR, "%s:%d: Error in included file", file->fileName,
 				file->lineNumber);
@@ -5012,7 +5030,7 @@ compileTable(const char *tableList, const char *displayTableList,
 			}
 			for (subTable = tableFiles; *subTable; subTable++)
 				if (!compileFile(*subTable, NULL, displayTable)) goto cleanup;
-			free_tablefiles(tableFiles);
+			lou_freeTableFiles(tableFiles);
 			tableFiles = NULL;
 		}
 		if (translationTable) {
@@ -5027,7 +5045,7 @@ compileTable(const char *tableList, const char *displayTableList,
 
 /* Clean up after compiling files */
 cleanup:
-	free_tablefiles(tableFiles);
+	lou_freeTableFiles(tableFiles);
 	if (warningCount)
 		_lou_logMessage(LOU_LOG_WARN, "%s: %d warnings issued", tableList, warningCount);
 	if (!errorCount) {
@@ -5071,6 +5089,11 @@ lou_getEmphClasses(const char *tableList) {
 		memcpy((void *)result, names, size);
 		return result;
 	}
+}
+
+void EXPORT_CALL
+lou_freeEmphClasses(char const **classes) {
+	free(classes);
 }
 
 void
@@ -5389,6 +5412,7 @@ lou_free(void) {
 	posMapping3 = NULL;
 	sizePosMapping3 = 0;
 	opcodeLengths[0] = 0;
+	_lou_freeTableIndex();
 }
 
 const char *EXPORT_CALL

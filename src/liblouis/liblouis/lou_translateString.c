@@ -29,7 +29,7 @@
  * @brief Translate to braille
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -80,6 +80,9 @@ initStringBufferPool() {
 static int
 getStringBuffer(int length) {
 	int i;
+
+	if (!stringBufferPool) initStringBufferPool();
+
 	for (i = 0; i < stringBufferPool->size; i++) {
 		if (!stringBufferPool->inUse[i]) {
 			stringBufferPool->buffers[i] = stringBufferPool->alloc(i, length);
@@ -93,6 +96,12 @@ getStringBuffer(int length) {
 
 static int
 releaseStringBuffer(int idx) {
+	if (!stringBufferPool) {
+		_lou_logMessage(LOU_LOG_ERROR,
+				"Attempt to free string buffer prior to initialization of pool");
+		return 0;
+	}
+
 	if (idx >= 0 && idx < stringBufferPool->size) {
 		int inUse = stringBufferPool->inUse[idx];
 		if (inUse && stringBufferPool->free)
@@ -3628,6 +3637,7 @@ translateString(const TranslationTableHeader *table, int mode, int currentPass,
 	int repwordStart;
 	int repwordLength;
 	const InString *origInput = input;
+	int warnedForNoTranslate = 0;
 	/* Main translation routine */
 	int k;
 	translation_direction = 1;
@@ -3648,7 +3658,9 @@ translateString(const TranslationTableHeader *table, int mode, int currentPass,
 	markEmphases(table, input, typebuf, wordBuffer, emphasisBuffer);
 
 	while (pos <= input->length) { /* the main translation loop */
-		if (pos > 0 && checkCharAttr(input->chars[pos - 1], CTC_Space, table) &&
+		if (pos > 0 &&
+				checkCharAttr(
+						input->chars[pos - 1], CTC_SeqDelimiter | CTC_Space, table) &&
 				(transOpcode != CTO_JoinableWord))
 			lastWord = (LastWord){ pos, output->length, insertEmphasesFrom };
 		if (pos == input->length) break;
@@ -3665,6 +3677,11 @@ translateString(const TranslationTableHeader *table, int mode, int currentPass,
 
 		if (!dontContract) dontContract = typebuf[pos] & no_contract;
 		if (typebuf[pos] & no_translate) {
+			if (!warnedForNoTranslate) {
+				_lou_logMessage(LOU_LOG_WARN,
+						"warning: Typeform no_translate is deprecated for input.");
+				warnedForNoTranslate = 1;
+			}
 			if (input->chars[pos] < 32 || input->chars[pos] > 126) goto failure;
 			widechar d = LOU_DOTS;
 			TranslationTableOffset offset = getChar(input->chars[pos], table)->otherRules;

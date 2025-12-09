@@ -115,6 +115,8 @@ table_files = \
 	en_CA.tbl \
 	en-chardefs.cti \
 	en-chess.ctb \
+	en-g3.ctb \
+	en-g3-patterns.dic \
 	en-gb-comp8.ctb \
 	en-gb-g1.utb \
 	en-GB-g2.ctb \
@@ -180,6 +182,12 @@ table_files = \
 	gurumuki.cti \
 	gu.tbl \
 	haw-us-g1.ctb \
+	hbo-cantillated-rules.uti \
+	hbo-cantillated.utb \
+	hbo-common-rules.uti \
+	hbo-ihbc-rules.uti \
+	hbo-slim-rules.uti \
+	hbo-slim.utb \
 	hbo.utb \
 	he-common-consonants.uti \
 	he-common-vowels-ihbc.uti \
@@ -232,8 +240,9 @@ table_files = \
 	it-it-comp8.utb \
 	it.tbl \
 	iu-ca-g1.ctb \
-	ja-kantenji.utb \
 	ja-kantenji-ucs2.utb \
+	ja-kantenji.utb \
+	ja-rokutenkanji.utb \
 	ka.utb \
 	ka-in-g1.utb \
 	kannada.cti \
@@ -267,13 +276,13 @@ table_files = \
 	loweredDigits6Dots.uti \
 	loweredDigits8Dots.uti \
 	latinLowercase.uti \
-	lt-6dot.tbl \
-	lt-6dot.utb \
 	lt.ctb \
-	lt.tbl \
+	lt-6dot.utb \
+	lt-8dot.utb \
 	Lv-Lv-g1.utb \
 	lv.tbl \
 	malayalam.cti \
+	mk-g1.utb \
 	mao-nz-g1.ctb \
 	marburg_single_cell_defs.cti \
 	marburg_unicode_defs.cti \
@@ -309,6 +318,7 @@ table_files = \
 	no-no-braillo-047-01.dis \
 	no-no-chardefs6.uti \
 	no-no-comp8.ctb \
+	no-no-cyrillic6dot.uti \
 	no-no.dis \
 	no-no-g0.utb \
 	no-no-g1.ctb \
@@ -337,12 +347,13 @@ table_files = \
 	pt-pt-g2.ctb \
 	pt.tbl \
 	pu-in-g1.utb \
+	quotation-marks.uti \
 	ro.ctb \
 	ro.tbl \
 	ro-g0.utb \
 	ru-brf.dis \
-	ru-compbrl.ctb \
-	ru.ctb \
+	ru-comp6.utb \
+	ru-comp8.utb \
 	ru-letters.dis \
 	ru-litbrl.ctb \
 	ru-litbrl-detailed.utb \
@@ -394,6 +405,8 @@ table_files = \
 	text_nabcc.dis \
 	th-g0.utb \
 	th-g1.utb \
+	th-g1.uti \
+	th-g2.ctb \
 	th-comp8-backward.utb \
 	tr.ctb \
 	tr-g1.ctb \
@@ -446,7 +459,10 @@ table_files = \
 comma=,
 fuzzing_yml = $(top_srcdir)/.github/workflows/fuzzing.yml
 $(fuzzing_yml): $(srcdir)/Makefile.am
-	[ ! -w $(fuzzing_yml) ] || sed -i -e "s/table: .*/table: [ $(patsubst %,%$(comma),$(filter %.utb %.ctb,$(table_files))) ]/" $(fuzzing_yml)
+	[ ! -w $(fuzzing_yml) ] || \
+	perl -0777 -i -pe \
+	     's~(table:).*?(steps:)~\1'"$$(printf '\n          - %s' $(filter %.utb %.ctb,$(table_files)))"'\n    \2~is' \
+	     $@
 
 all-local: $(fuzzing_yml)
 

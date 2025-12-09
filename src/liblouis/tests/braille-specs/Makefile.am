@@ -40,6 +40,8 @@ EXTRA_DIST =					\
 	de-g2-sbs.yaml				\
 	el-backward.yaml			\
 	el-forward.yaml				\
+	en-g3.yaml			\
+	en-g3-dictionary.yaml			\
 	en-GB-g2.yaml				\
 	en-gb-g1_harness.yaml			\
 	en-nabcc.yaml				\
@@ -90,8 +92,10 @@ EXTRA_DIST =					\
 	hu-hu-g2_harness.yaml			\
 	hu-hu-g2_dictionary_numbers.yaml			\
 	ipa.yaml				\
+	it.yaml				\
 	iu-ca-g1_harness.yaml			\
 	ja-kantenji.yaml			\
+	ja-rokutenkanji.yaml		  	\
 	ka.yaml					\
 	kk.yaml					\
 	kmr.yaml				\
@@ -100,9 +104,9 @@ EXTRA_DIST =					\
 	litdigits6Dots_backward.yaml		\
 	lg-ug-g1.yaml				\
 	lo.yaml					\
-	lt-6dot_harness.yaml			\
-	lt_harness.yaml				\
+	lt.yaml				\
 	lv_harness.yaml				\
+	mk.yaml					\
 	ml.yaml					\
 	mn-MN_harness.yaml			\
 	ms-my-g2.yaml				\
@@ -131,7 +135,6 @@ EXTRA_DIST =					\
 	syc.yaml				\
 	ta-ta-g1_harness.yaml			\
 	th.yaml					\
-	th-g1.yaml					\
 	tr.yaml					\
 	tt.yaml					\
 	uga.yaml				\
@@ -148,3 +151,6 @@ EXTRA_DIST =					\
 	zhcn-cbs.yaml				\
 	zhcn-g1.yaml				\
 	zhcn-g2.yaml
+
+clean-local:
+	rm -rf *.log *.trs

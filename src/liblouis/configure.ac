@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.68)
-AC_INIT([Liblouis], [3.33.0], [liblouis-liblouisxml@freelists.org], [liblouis], [http://www.liblouis.io])
+AC_INIT([Liblouis], [3.36.0], [liblouis-liblouisxml@freelists.org], [liblouis], [http://www.liblouis.io])
 AC_CONFIG_SRCDIR([liblouis/lou_backTranslateString.c])
 AM_CONFIG_HEADER(liblouis/config.h)
 
@@ -100,16 +100,16 @@ AH_BOTTOM([
 ])
 
 # increment if the interface has additions, changes, removals.
-LIBLOUIS_CURRENT=20
+LIBLOUIS_CURRENT=21
 
 # increment any time the source changes; set to 0 if you increment
 # CURRENT
-LIBLOUIS_REVISION=21
+LIBLOUIS_REVISION=1
 
 # increment if any interfaces have been added; set to 0 if any
 # interfaces have been changed or removed. removal has precedence over
 # adding, so set to 0 if both happened.
-LIBLOUIS_AGE=0
+LIBLOUIS_AGE=1
 
 AC_SUBST(LIBLOUIS_CURRENT)
 AC_SUBST(LIBLOUIS_REVISION)
@@ -276,10 +276,9 @@ AC_CONFIG_FILES([
 	tests/tables/resolve_table/dir_1/dir_1.1/Makefile
 	tests/tables/resolve_table/dir_2/Makefile
 	tests/tablesWithMetadata/Makefile
-	tests/ueb_test_data/Makefile
 	tests/yaml/Makefile
 	python/Makefile
-	python/setup.py
+	python/pyproject.toml
 	python/louis/Makefile
 	python/examples/Makefile
 	python/tests/Makefile
